@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(251, 146, 60, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(251, 146, 60, 0.08), transparent 55%),
+    #faf9f7;
+}
+
+/* ---------- Glassmorphism design tokens ----------
+   Every page in the app builds on these few classes, so this file is the
+   single place that defines RideLocal's v1.1 visual identity: white glass
+   surfaces, soft orange accents, warm gradients, restrained blur. */
+
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.card {
+  @apply glass rounded-2xl;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 12px 24px -12px rgba(17, 24, 39, 0.10);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+a.card:hover,
+.card.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(17, 24, 39, 0.06), 0 20px 32px -16px rgba(234, 88, 12, 0.18);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(17, 24, 39, 0.06);
+  transition: background-color 200ms ease, box-shadow 200ms ease;
+}
+
+.glass-nav.scrolled {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 8px 24px -16px rgba(17, 24, 39, 0.12);
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  @apply btn text-white;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  box-shadow: 0 1px 2px rgba(194, 65, 12, 0.15), 0 8px 20px -8px rgba(234, 88, 12, 0.55);
+}
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #fb923c, #f97316);
+  box-shadow: 0 1px 2px rgba(194, 65, 12, 0.2), 0 10px 24px -8px rgba(234, 88, 12, 0.65);
+}
+
+.btn-secondary {
+  @apply btn glass text-ink-900;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.btn-danger {
+  @apply btn bg-red-500/90 text-white hover:bg-red-600;
+}
+
+.input {
+  @apply w-full rounded-xl border border-neutral-200 bg-white/80 px-3.5 py-2.5 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent;
+}
+
+.label {
+  @apply block text-sm font-medium text-ink-700 mb-1;
+}
+
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+}
+
+.chip {
+  @apply glass inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-ink-700;
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes rl-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rl-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes rl-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-up {
+  animation: rl-fade-up 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-float {
+  animation: rl-float 5s ease-in-out infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #eee 25%, #f7f7f7 37%, #eee 63%);
+  background-size: 400% 100%;
+  animation: rl-shimmer 1.4s ease infinite;
+}
