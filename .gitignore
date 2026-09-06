@@ -1,0 +1,74 @@
+# ================================
+# RideLocal v1.1 - Git Ignore
+# ================================
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Backend uploaded files
+backend/uploads/
+uploads/
+
+# Backend build output
+backend/dist/
+dist/
+
+# Frontend build output
+frontend/dist/
+frontend/build/
+build/
+
+# Vite
+frontend/.vite/
+.vite/
+
+# TypeScript generated files
+*.tsbuildinfo
+
+# Prisma generated files
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Test / coverage output
+coverage/
+.nyc_output/
+test-results/
+
+# IDE settings
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Local Docker/PostgreSQL data
+postgres-data/
+pgdata/
+
+# Certificates / private keys
+*.pem
+*.key
+*.crt
