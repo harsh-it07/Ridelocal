@@ -140,7 +140,7 @@ export function VehicleDetailsPage() {
         </div>
 
         {days > 0 && (
-          <div className="mt-4 rounded-xl bg-neutral-50 p-4 text-sm">
+          <div className="mt-4 rounded-xl bg-neutral-50 p-4 text-sm dark:bg-[#14141D] border border-transparent dark:border-neutral-800">
             <p className="text-ink-500">
               Estimated total for {days} day{days > 1 ? "s" : ""} (final price is confirmed by the
               server):

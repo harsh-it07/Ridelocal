@@ -37,14 +37,14 @@ export function RegisterPage() {
         <h1 className="font-display text-2xl font-bold text-ink-900">Create your account</h1>
         <p className="mt-1 text-sm text-ink-500">Rent a ride, or list your own.</p>
 
-        <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-neutral-100 p-1">
+        <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-neutral-100 p-1 dark:bg-[#14141D] border border-transparent dark:border-neutral-800">
           {(["CUSTOMER", "OWNER"] as const).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => setRole(r)}
               className={`rounded-lg py-2 text-sm font-semibold transition-colors ${
-                role === r ? "bg-white text-brand-600 shadow-sm" : "text-ink-500"
+                role === r ? "bg-white text-brand-600 shadow-sm dark:bg-neutral-800" : "text-ink-500"
               }`}
             >
               {r === "CUSTOMER" ? "I want to rent" : "I want to list a vehicle"}
