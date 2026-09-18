@@ -1,54 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
-
-/* ─── Icons ────────────────────────────────────────────── */
-function SunIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="5" />
-      <line x1="12" y1="1"  x2="12" y2="3"  />
-      <line x1="12" y1="21" x2="12" y2="23" />
-      <line x1="4.22"  y1="4.22"  x2="5.64"  y2="5.64"  />
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-      <line x1="1"  y1="12" x2="3"  y2="12" />
-      <line x1="21" y1="12" x2="23" y2="12" />
-      <line x1="4.22"  y1="19.78" x2="5.64"  y2="18.36" />
-      <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"  />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
-  );
-}
-
-/* ─── Theme toggle pill ────────────────────────────────── */
-function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
-  return (
-    <button
-      id="theme-toggle"
-      onClick={toggleTheme}
-      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      className="theme-toggle-btn"
-    >
-      <span className={`theme-icon ${theme === "light" ? "active" : ""}`}><SunIcon /></span>
-      <span className={`theme-icon ${theme === "dark"  ? "active" : ""}`}><MoonIcon /></span>
-    </button>
-  );
-}
 
 /* ─── Main component ───────────────────────────────────── */
 export function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [scrolled,    setScrolled]    = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -65,16 +23,15 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { to: "/search",                    label: "Explore Bikes" },
-    { to: "/#how-it-works",             label: "How It Works"  },
-    { to: "/get-started?role=OWNER",    label: "List Your Bike"},
+    { to: "/search",                 label: "Explore Bikes" },
+    { to: "/#how-it-works",          label: "How It Works"  },
+    { to: "/get-started?role=OWNER", label: "List Your Bike"},
   ];
 
   return (
-    /* Full-width sticky row — transparent, just centres the capsule */
     <header className="navbar-wrap sticky top-0 z-40 flex justify-center px-4 py-3 pointer-events-none">
 
-      {/* ── Glass capsule pill ── */}
+      {/* ── Liquid Glass Panel Navbar ── */}
       <div
         className={`navbar-capsule pointer-events-auto w-full max-w-5xl
           ${scrolled    ? "scrolled"  : ""}
@@ -82,51 +39,50 @@ export function Navbar() {
         `}
       >
         {/* Top bar */}
-        <div className="flex items-center justify-between px-4 py-2.5 sm:px-5">
+        <div className="flex items-center justify-between px-5 py-3 sm:px-6">
 
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 font-display text-base font-extrabold"
-            style={{ color: "var(--text-heading)" }}
+            className="flex items-center gap-2 font-display text-lg font-bold tracking-tight text-ink-900 hover:opacity-80 transition-opacity"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-sm text-sm font-bold flex-shrink-0">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-500/25 text-sm font-bold flex-shrink-0">
               R
             </span>
-            Ride<span className="text-brand-500">Local</span>
+            <span className="text-ink-900">
+              Ride<span className="text-brand-600">Local</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-0.5 md:flex">
+          <nav className="hidden items-center gap-1 md:flex">
             {navLinks.map((l) => (
               <Link key={l.label} to={l.to} className="nav-link">{l.label}</Link>
             ))}
-            {user?.role === "OWNER"    && <Link to="/owner"    className="nav-link">Owner dashboard</Link>}
+            {user?.role === "OWNER"    && <Link to="/owner"    className="nav-link">Dashboard</Link>}
             {user?.role === "ADMIN"    && <Link to="/admin"    className="nav-link">Admin</Link>}
-            {user?.role === "CUSTOMER" && <Link to="/bookings" className="nav-link">My bookings</Link>}
+            {user?.role === "CUSTOMER" && <Link to="/bookings" className="nav-link">My Bookings</Link>}
           </nav>
 
-          {/* Desktop right: toggle + auth */}
-          <div className="hidden items-center gap-2 md:flex">
-            <ThemeToggle />
+          {/* Desktop right: auth buttons */}
+          <div className="hidden items-center gap-2.5 md:flex">
             {user ? (
               <>
                 <Link to="/profile" className="chip">{user.name.split(" ")[0]}</Link>
-                <button onClick={handleLogout} className="btn-secondary !py-1.5 !px-3.5 !text-sm">
+                <button onClick={handleLogout} className="btn-secondary !py-2 !px-4 !text-sm">
                   Log out
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login"       className="btn-secondary !py-1.5 !px-3.5 !text-sm">Log in</Link>
-                <Link to="/get-started" className="btn-primary   !py-1.5 !px-3.5 !text-sm">Get started</Link>
+                <Link to="/login" className="btn-secondary !py-2 !px-4 !text-sm">Log in</Link>
+                <Link to="/get-started" className="btn-glass !py-2 !px-5 !text-sm">Get Started</Link>
               </>
             )}
           </div>
 
-          {/* Mobile: toggle + hamburger */}
+          {/* Mobile hamburger */}
           <div className="flex items-center gap-2 md:hidden">
-            <ThemeToggle />
             <button
               onClick={() => setMobileOpen((v) => !v)}
               className="btn-secondary !p-2.5"
@@ -143,10 +99,10 @@ export function Navbar() {
         {/* Mobile drawer */}
         {mobileOpen && (
           <div
-            className="px-4 py-3 md:hidden"
-            style={{ borderTop: "1px solid var(--border-glass)" }}
+            className="px-5 py-4 md:hidden"
+            style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
           >
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1.5">
               {navLinks.map((l) => (
                 <Link
                   key={l.label}
@@ -157,13 +113,13 @@ export function Navbar() {
                   {l.label}
                 </Link>
               ))}
-              {user?.role === "OWNER"    && <Link to="/owner"    onClick={() => setMobileOpen(false)} className="nav-link">Owner dashboard</Link>}
+              {user?.role === "OWNER"    && <Link to="/owner"    onClick={() => setMobileOpen(false)} className="nav-link">Dashboard</Link>}
               {user?.role === "ADMIN"    && <Link to="/admin"    onClick={() => setMobileOpen(false)} className="nav-link">Admin</Link>}
-              {user?.role === "CUSTOMER" && <Link to="/bookings" onClick={() => setMobileOpen(false)} className="nav-link">My bookings</Link>}
+              {user?.role === "CUSTOMER" && <Link to="/bookings" onClick={() => setMobileOpen(false)} className="nav-link">My Bookings</Link>}
 
               <div
-                className="mt-2 flex gap-2 pt-3"
-                style={{ borderTop: "1px solid var(--border-subtle)" }}
+                className="mt-3 flex gap-2.5 pt-4"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
               >
                 {user ? (
                   <>
@@ -173,7 +129,7 @@ export function Navbar() {
                 ) : (
                   <>
                     <Link to="/login"       onClick={() => setMobileOpen(false)} className="btn-secondary flex-1 text-sm">Log in</Link>
-                    <Link to="/get-started" onClick={() => setMobileOpen(false)} className="btn-primary  flex-1 text-sm">Get started</Link>
+                    <Link to="/get-started" onClick={() => setMobileOpen(false)} className="btn-glass flex-1 text-sm">Get Started</Link>
                   </>
                 )}
               </div>

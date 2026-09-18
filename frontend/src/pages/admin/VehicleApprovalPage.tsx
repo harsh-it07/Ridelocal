@@ -62,7 +62,7 @@ export function VehicleApprovalPage() {
                         rel="noreferrer"
                         className="chip !py-1 text-xs"
                       >
-                        📄 {d.documentType.replace(/_/g, " ").toLowerCase()}
+                        {d.documentType.replace(/_/g, " ").toLowerCase()}
                       </a>
                     ))}
                   </div>

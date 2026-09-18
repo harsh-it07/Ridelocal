@@ -17,7 +17,7 @@ export function SectionContainer({
 }
 
 export function EmptyState({
-  icon = "🔍",
+  icon = "—",
   title,
   description,
   action,
@@ -28,10 +28,14 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="card flex flex-col items-center gap-2 px-6 py-14 text-center">
+    <div className="card flex flex-col items-center gap-3 px-6 py-14 text-center animate-scale-up">
       <span className="text-3xl">{icon}</span>
       <p className="font-display font-semibold text-ink-900">{title}</p>
-      {description && <p className="max-w-sm text-sm text-ink-500">{description}</p>}
+      {description && (
+        <p className="max-w-sm text-sm text-ink-500">
+          {description}
+        </p>
+      )}
       {action && <div className="mt-3">{action}</div>}
     </div>
   );
@@ -50,7 +54,10 @@ export function LoadingState({ label = "Loading..." }: { label?: string }) {
 
 export function ErrorState({ message }: { message: string }) {
   return (
-    <div className="card border-red-200/60 bg-red-50/60 px-6 py-4 text-sm text-red-700">
+    <div className="card px-6 py-4 text-sm animate-scale-up" style={{
+      borderColor: 'rgba(239, 68, 68, 0.20)',
+      color: '#f87171',
+    }}>
       {message}
     </div>
   );

@@ -30,21 +30,26 @@ export function LoginPage() {
 
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-12">
-      <div className="card p-8">
+      <div className="card p-8 animate-scale-up">
         {isAdminEntry && (
-          <div className="mb-5 chip !rounded-xl !px-3 !py-2 text-ink-700">
-            🛡️ Admin sign in — this account must already exist; there is no admin signup.
+          <div className="mb-5 badge text-ink-700">
+            Admin sign in — this account must already exist; there is no admin signup.
           </div>
         )}
-        <h1 className="font-display text-2xl font-bold text-ink-900">Welcome back</h1>
-        <p className="mt-1 text-sm text-ink-500">Log in to find or manage your rides.</p>
+        <h1 className="font-display text-2xl font-bold">
+          Welcome back
+        </h1>
+        <p className="mt-1.5 text-sm text-ink-500">
+          Log in to find or manage your rides.
+        </p>
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        <form className="mt-7 space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="label">Email</label>
             <input
               type="email"
               className="input"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -55,30 +60,33 @@ export function LoginPage() {
             <input
               type="password"
               className="input"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <p className="text-sm" style={{ color: '#f87171' }}>{error}</p>
+          )}
 
           <button type="submit" disabled={submitting} className="btn-primary w-full">
             {submitting ? "Logging in..." : "Log in"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-ink-500">
+        <p className="mt-5 text-center text-sm text-ink-500">
           New here?{" "}
           <Link to="/register" className="font-medium text-brand-600">
             Create an account
           </Link>
         </p>
 
-        <div className="mt-6 rounded-xl bg-neutral-50 p-3 text-xs text-ink-500">
+        <div className="mx-auto mt-6 max-w-md card p-5 text-sm text-ink-500">
           Demo logins (seeded): <br />
           customer@ridelocal.dev · owner@ridelocal.dev · admin@ridelocal.dev <br />
-          Password: <span className="font-mono">Password@123</span>
+          Password: <span className="font-mono text-ink-900">Password@123</span>
         </div>
       </div>
     </div>

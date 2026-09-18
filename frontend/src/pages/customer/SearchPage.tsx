@@ -73,7 +73,7 @@ export function SearchPage() {
 
       <div className="card mt-5 grid gap-3 p-4 sm:grid-cols-5">
         <button onClick={detectLocation} className="btn-secondary sm:col-span-1">
-          📍 Use my location
+          Use my location
         </button>
         <input
           className="input sm:col-span-1"

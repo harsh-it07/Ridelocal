@@ -6,10 +6,10 @@ import { PaymentMethod } from "../../types";
 type Stage = "select" | "processing" | "success" | "failed";
 
 const METHODS: { id: PaymentMethod; label: string; icon: string }[] = [
-  { id: "UPI", label: "UPI", icon: "📱" },
-  { id: "CARD", label: "Credit / Debit Card", icon: "💳" },
-  { id: "NETBANKING", label: "Net Banking", icon: "🏦" },
-  { id: "WALLET", label: "Wallet", icon: "👛" },
+  { id: "UPI", label: "UPI", icon: "UP" },
+  { id: "CARD", label: "Credit / Debit Card", icon: "CD" },
+  { id: "NETBANKING", label: "Net Banking", icon: "NB" },
+  { id: "WALLET", label: "Wallet", icon: "WL" },
 ];
 
 export function PaymentPage() {
@@ -80,17 +80,23 @@ export function PaymentPage() {
           {booking.vehicle?.brand} {booking.vehicle?.model}
         </p>
 
-        <div className="mt-4 space-y-2 rounded-xl bg-white/60 p-4 text-sm">
+        {/* Pricing breakdown — light bg with BLACK text for readability */}
+        <div
+          className="mt-4 space-y-2 rounded-xl bg-white/60 p-4 text-sm"
+        >
           <Row label="Rental amount" value={booking.rentalAmount} />
           <Row label="Platform fee" value={booking.platformFee} />
           <Row label="Refundable security deposit" value={booking.securityDeposit} />
-          <div className="mt-2 flex justify-between border-t border-neutral-200 pt-2 font-bold text-ink-900">
+          <div
+            className="mt-2 flex justify-between pt-2 font-bold"
+            style={{ borderTop: '1px solid rgba(0,0,0,0.10)', color: '#111827' }}
+          >
             <span>Total payable now</span>
             <span>₹{booking.totalAmount}</span>
           </div>
         </div>
 
-        {error && !modalOpen && <p className="mt-3 text-sm text-red-600">{error}</p>}
+        {error && !modalOpen && <p className="mt-3 text-sm" style={{ color: '#f87171' }}>{error}</p>}
 
         <button onClick={openGateway} className="btn-primary mt-5 w-full">
           Pay ₹{booking.totalAmount}
@@ -102,7 +108,7 @@ export function PaymentPage() {
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-ink-900/40">
           <div className="card w-full max-w-sm p-6">
             {stage === "select" && (
               <>
@@ -113,18 +119,26 @@ export function PaymentPage() {
                   ₹{booking.totalAmount}
                 </p>
 
+                {/* Payment method buttons — light bg with BLACK text */}
                 <div className="mt-5 space-y-2">
                   {METHODS.map((m) => (
                     <button
                       key={m.id}
                       onClick={() => setMethod(m.id)}
-                      className={`flex w-full items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left text-sm transition-colors ${
-                        method === m.id
-                          ? "border-brand-400 bg-brand-50"
-                          : "border-neutral-200 bg-white/70 hover:bg-white"
-                      }`}
+                      className="flex w-full items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left text-sm transition-all duration-200"
+                      style={{
+                        background: method === m.id
+                          ? 'rgba(255,255,255,0.90)'
+                          : 'rgba(255,255,255,0.80)',
+                        borderColor: method === m.id
+                          ? '#f97316'
+                          : 'rgba(255,255,255,0.30)',
+                        boxShadow: method === m.id
+                          ? '0 0 0 2px rgba(249,115,22,0.20)'
+                          : 'none',
+                      }}
                     >
-                      <span className="text-lg">{m.icon}</span>
+                      <span className="text-xs font-bold" style={{ color: '#fb923c' }}>{m.icon}</span>
                       <span className="font-medium text-ink-900">{m.label}</span>
                       {method === m.id && <span className="ml-auto text-brand-600">●</span>}
                     </button>
@@ -144,7 +158,7 @@ export function PaymentPage() {
 
             {stage === "processing" && (
               <div className="flex flex-col items-center gap-3 py-8 text-center">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600" />
+                <div className="h-10 w-10 animate-spin rounded-full border-4" style={{ borderColor: 'rgba(249,115,22,0.20)', borderTopColor: '#f97316' }} />
                 <p className="font-medium text-ink-900">Payment processing…</p>
                 <p className="text-sm text-ink-500">Confirming with {method}, please wait.</p>
               </div>
@@ -152,7 +166,10 @@ export function PaymentPage() {
 
             {stage === "success" && (
               <div className="flex flex-col items-center gap-2 py-6 text-center">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-2xl text-green-700">
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
+                  style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80' }}
+                >
                   ✓
                 </span>
                 <p className="font-display font-bold text-ink-900">Payment successful</p>
@@ -168,7 +185,10 @@ export function PaymentPage() {
 
             {stage === "failed" && (
               <div className="flex flex-col items-center gap-2 py-6 text-center">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-2xl text-red-700">
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
+                  style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171' }}
+                >
                   ✕
                 </span>
                 <p className="font-display font-bold text-ink-900">Payment failed</p>
@@ -187,7 +207,7 @@ export function PaymentPage() {
 
 function Row({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex justify-between text-ink-700">
+    <div className="flex justify-between" style={{ color: '#374151' }}>
       <span>{label}</span>
       <span>₹{value}</span>
     </div>

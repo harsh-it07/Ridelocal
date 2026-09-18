@@ -88,7 +88,7 @@ export function VehicleDetailsPage() {
           <div>
             <p className="text-ink-500">Rating</p>
             <p className="font-semibold text-ink-900">
-              ⭐ {vehicle.ratingAvg?.toFixed?.(1) ?? "0.0"} ({vehicle.ratingCount})
+              {vehicle.ratingAvg?.toFixed?.(1) ?? "0.0"} ({vehicle.ratingCount})
             </p>
           </div>
         </div>
@@ -167,7 +167,7 @@ export function VehicleDetailsPage() {
             {vehicle.reviews.map((r: any) => (
               <div key={r.id} className="border-b border-neutral-100 pb-3 last:border-0">
                 <p className="text-sm font-semibold text-ink-900">
-                  {r.customer?.name} — ⭐ {r.rating}
+                  {r.customer?.name} — {r.rating}/5
                 </p>
                 {r.comment && <p className="text-sm text-ink-500">{r.comment}</p>}
               </div>

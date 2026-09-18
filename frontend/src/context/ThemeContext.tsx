@@ -1,6 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect } from "react";
 
-type Theme = "light" | "dark";
+// Simplified: single warm-dark theme, no toggle needed.
+// The liquid glass aesthetic uses one consistent warm gradient canvas.
+// We keep the provider structure for API compatibility with other pages.
+
+type Theme = "dark";
 
 interface ThemeContextValue {
   theme: Theme;
@@ -8,38 +12,19 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: "light",
+  theme: "dark",
   toggleTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem("rl-theme") as Theme | null;
-    if (stored) return stored;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  });
-
   useEffect(() => {
-    const root = document.documentElement;
-    const body = document.body;
-    if (theme === "dark") {
-      root.classList.add("dark");
-      body.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-      body.classList.remove("dark");
-    }
-    localStorage.setItem("rl-theme", theme);
-  }, [theme]);
-
-  function toggleTheme() {
-    setTheme((t) => (t === "light" ? "dark" : "light"));
-  }
+    // Apply dark class for any Tailwind dark: utilities still in use
+    document.documentElement.classList.add("dark");
+    document.body.classList.add("dark");
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme: "dark", toggleTheme: () => {} }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -61,7 +61,7 @@ export function VerificationQueuePage() {
                       rel="noreferrer"
                       className="chip !py-1 text-xs"
                     >
-                      📄 View {d.documentType.replace(/_/g, " ").toLowerCase()}
+                      View {d.documentType.replace(/_/g, " ").toLowerCase()}
                     </a>
                   ))}
                 </div>

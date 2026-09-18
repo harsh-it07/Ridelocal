@@ -1,31 +1,68 @@
+// Glass-styled status badges for the warm dark gradient background.
+// Each status maps to a translucent glass color pairing.
 const COLORS: Record<string, string> = {
-  VERIFIED: "bg-green-100 text-green-800",
-  ACTIVE: "bg-green-100 text-green-800",
-  CONFIRMED: "bg-green-100 text-green-800",
-  COMPLETED: "bg-blue-100 text-blue-800",
-  PENDING: "bg-amber-100 text-amber-800",
-  PENDING_REVIEW: "bg-amber-100 text-amber-800",
-  PENDING_PAYMENT: "bg-amber-100 text-amber-800",
-  UNDER_REVIEW: "bg-amber-100 text-amber-800",
-  REFUND_PENDING: "bg-amber-100 text-amber-800",
-  UNVERIFIED: "bg-neutral-100 text-neutral-700",
-  DRAFT: "bg-neutral-100 text-neutral-700",
-  REJECTED: "bg-red-100 text-red-800",
-  PAYMENT_FAILED: "bg-red-100 text-red-800",
-  DISPUTED: "bg-red-100 text-red-800",
-  SUSPENDED: "bg-red-100 text-red-800",
-  CANCELLED: "bg-neutral-200 text-neutral-700",
-  REFUNDED: "bg-blue-100 text-blue-800",
-  EXPIRED: "bg-neutral-200 text-neutral-700",
-  PAID: "bg-green-100 text-green-800",
-  PROCESSING: "bg-amber-100 text-amber-800",
-  FAILED: "bg-red-100 text-red-800",
-  OPEN: "bg-amber-100 text-amber-800",
-  RESOLVED: "bg-green-100 text-green-800",
-  CLOSED: "bg-neutral-200 text-neutral-700",
+  VERIFIED: "glass-badge-green",
+  ACTIVE: "glass-badge-green",
+  CONFIRMED: "glass-badge-green",
+  COMPLETED: "glass-badge-blue",
+  PENDING: "glass-badge-amber",
+  PENDING_REVIEW: "glass-badge-amber",
+  PENDING_PAYMENT: "glass-badge-amber",
+  UNDER_REVIEW: "glass-badge-amber",
+  REFUND_PENDING: "glass-badge-amber",
+  UNVERIFIED: "glass-badge-neutral",
+  DRAFT: "glass-badge-neutral",
+  REJECTED: "glass-badge-red",
+  PAYMENT_FAILED: "glass-badge-red",
+  DISPUTED: "glass-badge-red",
+  SUSPENDED: "glass-badge-red",
+  CANCELLED: "glass-badge-neutral",
+  REFUNDED: "glass-badge-blue",
+  EXPIRED: "glass-badge-neutral",
+  PAID: "glass-badge-green",
+  PROCESSING: "glass-badge-amber",
+  FAILED: "glass-badge-red",
+  OPEN: "glass-badge-amber",
+  RESOLVED: "glass-badge-green",
+  CLOSED: "glass-badge-neutral",
 };
 
 export function StatusBadge({ status }: { status: string }) {
-  const cls = COLORS[status] || "bg-neutral-100 text-neutral-700";
-  return <span className={`badge ${cls}`}>{status.replace(/_/g, " ")}</span>;
+  const cls = COLORS[status] || "glass-badge-neutral";
+  return (
+    <span
+      className="badge"
+      style={BADGE_STYLES[cls] || BADGE_STYLES["glass-badge-neutral"]}
+    >
+      {status.replace(/_/g, " ")}
+    </span>
+  );
 }
+
+const BADGE_STYLES: Record<string, React.CSSProperties> = {
+  "glass-badge-green": {
+    background: "rgba(34, 197, 94, 0.12)",
+    color: "#4ade80",
+    borderColor: "rgba(34, 197, 94, 0.15)",
+  },
+  "glass-badge-blue": {
+    background: "rgba(59, 130, 246, 0.12)",
+    color: "#60a5fa",
+    borderColor: "rgba(59, 130, 246, 0.15)",
+  },
+  "glass-badge-amber": {
+    background: "rgba(245, 158, 11, 0.12)",
+    color: "#fbbf24",
+    borderColor: "rgba(245, 158, 11, 0.15)",
+  },
+  "glass-badge-red": {
+    background: "rgba(239, 68, 68, 0.12)",
+    color: "#f87171",
+    borderColor: "rgba(239, 68, 68, 0.15)",
+  },
+  "glass-badge-neutral": {
+    background: "rgba(255, 255, 255, 0.06)",
+    color: "rgba(255, 255, 255, 0.55)",
+    borderColor: "rgba(255, 255, 255, 0.08)",
+  },
+};
