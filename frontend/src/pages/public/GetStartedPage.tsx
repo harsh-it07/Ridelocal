@@ -54,10 +54,10 @@ export function GetStartedPage() {
                 ? "ring-2"
                 : ""
             }`}
-            style={highlight === opt.role ? { ringColor: 'rgba(249,115,22,0.40)', borderColor: 'rgba(249,115,22,0.30)' } : {}}
+            style={highlight === opt.role ? { ringColor: 'rgba(249, 115, 22,0.40)', borderColor: 'rgba(249, 115, 22,0.30)' } : {}}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold tracking-wide"
-              style={{ background: 'rgba(249,115,22,0.12)', color: '#fb923c' }}
+              style={{ background: 'rgba(249, 115, 22,0.12)', color: '#fb923c' }}
             >
               {opt.icon}
             </div>

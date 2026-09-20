@@ -5,9 +5,9 @@ export function LandingPage() {
     <div className="relative overflow-hidden">
 
       {/* ─── Ambient Orbs (decorative) ──────────────────── */}
-      <div className="ambient-orb" style={{ width: 500, height: 500, top: '-10%', right: '-5%', background: 'radial-gradient(circle, rgba(249,115,22,0.25), transparent 70%)', animationDelay: '0s' }} />
-      <div className="ambient-orb" style={{ width: 400, height: 400, bottom: '20%', left: '-8%', background: 'radial-gradient(circle, rgba(194,65,12,0.20), transparent 70%)', animationDelay: '5s' }} />
-      <div className="ambient-orb" style={{ width: 300, height: 300, top: '40%', right: '30%', background: 'radial-gradient(circle, rgba(251,191,36,0.12), transparent 70%)', animationDelay: '10s' }} />
+      <div className="ambient-orb" style={{ width: 500, height: 500, top: '-10%', right: '-5%', background: 'radial-gradient(circle, rgba(249, 115, 22,0.25), transparent 70%)', animationDelay: '0s' }} />
+      <div className="ambient-orb" style={{ width: 400, height: 400, bottom: '20%', left: '-8%', background: 'radial-gradient(circle, rgba(249, 115, 22,0.20), transparent 70%)', animationDelay: '5s' }} />
+      <div className="ambient-orb" style={{ width: 300, height: 300, top: '40%', right: '30%', background: 'radial-gradient(circle, rgba(249, 115, 22,0.12), transparent 70%)', animationDelay: '10s' }} />
 
       {/* ═══ HERO ═══════════════════════════════════════════ */}
       <section className="relative mx-auto max-w-7xl px-5 pb-16 pt-14 sm:px-8 sm:pt-20 min-h-[85vh] flex flex-col justify-end">
@@ -133,7 +133,7 @@ export function LandingPage() {
       {/* ═══ OWNER CTA ══════════════════════════════════════ */}
       <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
         <div className="glass-panel p-10 sm:p-14 text-center animate-fade-up">
-          <div className="ambient-orb" style={{ width: 200, height: 200, top: '-20%', left: '10%', background: 'radial-gradient(circle, rgba(249,115,22,0.20), transparent 70%)', animationDelay: '3s' }} />
+          <div className="ambient-orb" style={{ width: 200, height: 200, top: '-20%', left: '10%', background: 'radial-gradient(circle, rgba(249, 115, 22,0.20), transparent 70%)', animationDelay: '3s' }} />
 
           <span className="chip mb-5 inline-block">For Owners</span>
           <h2 className="font-display text-3xl font-bold sm:text-4xl text-ink-900">

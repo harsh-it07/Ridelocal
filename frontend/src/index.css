@@ -34,10 +34,10 @@
   --glass-border-glow: rgba(249, 115, 22, 0.15);
 
   /* Text */
-  --text-heading: #111827;
-  --text-body: rgba(17, 24, 39, 0.85);
-  --text-muted: rgba(17, 24, 39, 0.60);
-  --text-faint: rgba(17, 24, 39, 0.40);
+  --text-heading: #FFFFF0;
+  --text-body: rgba(255, 255, 240, 0.85);
+  --text-muted: rgba(255, 255, 240, 0.60);
+  --text-faint: rgba(255, 255, 240, 0.40);
 
   /* Shadows & Glows */
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -69,7 +69,10 @@ html, body, #root {
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: #ffffff;
-  background-image: none;
+  /* Fully visible background */
+  background-image: url('/custom-bg.jpg');
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
   color: var(--text-body);
   overflow-x: hidden;
@@ -109,15 +112,15 @@ p, span, a, li, label, div {
 }
 
 /* ─── Dark mode overrides (for Tailwind dark: classes) ────── */
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 { color: #111827; }
-.dark .text-ink-900, html.dark .text-ink-900 { color: #111827; }
-.dark .text-ink-700, html.dark .text-ink-700 { color: rgba(17, 24, 39, 0.85); }
-.dark .text-ink-500, html.dark .text-ink-500 { color: rgba(17, 24, 39, 0.60); }
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 { color: #FFFFF0; }
+.dark .text-ink-900, html.dark .text-ink-900 { color: #FFFFF0; }
+.dark .text-ink-700, html.dark .text-ink-700 { color: rgba(255, 255, 240, 0.85); }
+.dark .text-ink-500, html.dark .text-ink-500 { color: rgba(255, 255, 240, 0.60); }
 
 /* Override Tailwind text colors for dark backgrounds */
-.text-ink-900 { color: #111827 !important; }
-.text-ink-700 { color: rgba(17, 24, 39, 0.85) !important; }
-.text-ink-500 { color: rgba(17, 24, 39, 0.60) !important; }
+.text-ink-900 { color: #FFFFF0 !important; }
+.text-ink-700 { color: rgba(255, 255, 240, 0.85) !important; }
+.text-ink-500 { color: rgba(255, 255, 240, 0.60) !important; }
 
 /* ═══════════════════════════════════════════════════════════
    LIQUID GLASS SURFACES
@@ -281,11 +284,11 @@ header.navbar-wrap {
 }
 
 .theme-icon.active {
-  background: linear-gradient(135deg, #f97316, #ea580c);
+  background: linear-gradient(135deg, #fb923c, #f97316);
   color: #fff;
   transform: scale(1);
   opacity: 1;
-  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.50);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.50);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -312,11 +315,11 @@ header.navbar-wrap {
 /* Primary — Glass with warm gradient glow */
 .btn-primary {
   @apply btn text-ink-900;
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.85), rgba(234, 88, 12, 0.85));
-  border: 1px solid rgba(251, 146, 60, 0.40);
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.85), rgba(249, 115, 22, 0.85));
+  border: 1px solid rgba(249, 115, 22, 0.40);
   box-shadow:
     0 2px 12px rgba(249, 115, 22, 0.30),
-    0 8px 24px -8px rgba(234, 88, 12, 0.40),
+    0 8px 24px -8px rgba(249, 115, 22, 0.40),
     inset 0 1px 0 rgba(255, 255, 255, 0.20);
   backdrop-filter: blur(16px);
 }
@@ -333,10 +336,10 @@ header.navbar-wrap {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(251, 146, 60, 0.90), rgba(249, 115, 22, 0.90));
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.90), rgba(249, 115, 22, 0.90));
   box-shadow:
     0 4px 16px rgba(249, 115, 22, 0.40),
-    0 12px 32px -8px rgba(234, 88, 12, 0.50),
+    0 12px 32px -8px rgba(249, 115, 22, 0.50),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transform: translateY(-1px);
 }
@@ -590,19 +593,19 @@ header.navbar-wrap {
   font-size: clamp(3.5rem, 10vw, 8rem);
   line-height: 0.95;
   letter-spacing: -0.03em;
-  color: var(--text-heading);
+  color: #FFFFF0;
   text-shadow: 0 4px 40px rgba(0, 0, 0, 0.20);
 }
 
 .hero-description {
-  color: var(--text-muted);
+  color: #FFFFF0;
   font-size: 0.9375rem;
   line-height: 1.65;
   max-width: 22rem;
 }
 
 .hero-description strong {
-  color: var(--text-heading);
+  color: #FFFFF0;
   font-weight: 600;
 }
 

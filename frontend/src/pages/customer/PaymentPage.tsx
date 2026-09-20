@@ -131,10 +131,10 @@ export function PaymentPage() {
                           ? 'rgba(255,255,255,0.90)'
                           : 'rgba(255,255,255,0.80)',
                         borderColor: method === m.id
-                          ? '#f97316'
+                          ? '#fb923c'
                           : 'rgba(255,255,255,0.30)',
                         boxShadow: method === m.id
-                          ? '0 0 0 2px rgba(249,115,22,0.20)'
+                          ? '0 0 0 2px rgba(249, 115, 22,0.20)'
                           : 'none',
                       }}
                     >
@@ -158,7 +158,7 @@ export function PaymentPage() {
 
             {stage === "processing" && (
               <div className="flex flex-col items-center gap-3 py-8 text-center">
-                <div className="h-10 w-10 animate-spin rounded-full border-4" style={{ borderColor: 'rgba(249,115,22,0.20)', borderTopColor: '#f97316' }} />
+                <div className="h-10 w-10 animate-spin rounded-full border-4" style={{ borderColor: 'rgba(249, 115, 22,0.20)', borderTopColor: '#fb923c' }} />
                 <p className="font-medium text-ink-900">Payment processing…</p>
                 <p className="text-sm text-ink-500">Confirming with {method}, please wait.</p>
               </div>
