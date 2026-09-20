@@ -36,33 +36,42 @@ uploadsRouter.post(
 // certificates from being publicly reachable.
 uploadsRouter.get(
   "/file/:category/:filename",
-  requireAuth,
   asyncHandler(async (req, res) => {
     const { category, filename } = req.params;
     if (!CATEGORIES.includes(category as any)) throw new AppError("Not found", 404);
 
-    const fileRef = `local://${category}/${filename}`;
-    const isAdmin = req.user!.role === "ADMIN";
-
-    if (!isAdmin) {
-      const [userDoc, vehicleDoc] = await Promise.all([
-        prisma.userDocument.findFirst({ where: { secureFileReference: fileRef } }),
-        prisma.vehicleDocument.findFirst({
-          where: { secureFileReference: fileRef },
-          include: { vehicle: true },
-        }),
-      ]);
-
-      const ownsUserDoc = userDoc?.userId === req.user!.userId;
-      const ownsVehicleDoc = vehicleDoc?.vehicle.ownerId === req.user!.userId;
-
-      if (!ownsUserDoc && !ownsVehicleDoc) {
-        throw new AppError("You do not have access to this file", 403);
-      }
+    // Bike images are public vehicle photos visible to all riders
+    if (category === "bike-images") {
+      const filePath = path.join(env.uploadsDir, category, filename);
+      if (!fs.existsSync(filePath)) throw new AppError("File not found", 404);
+      return res.sendFile(path.resolve(filePath));
     }
 
-    const filePath = path.join(env.uploadsDir, category, filename);
-    if (!fs.existsSync(filePath)) throw new AppError("File not found", 404);
-    res.sendFile(path.resolve(filePath));
+    // Sensitive documents (driving licences, RC certificates) require authentication & ownership
+    return requireAuth(req, res, async () => {
+      const fileRef = `local://${category}/${filename}`;
+      const isAdmin = req.user!.role === "ADMIN";
+
+      if (!isAdmin) {
+        const [userDoc, vehicleDoc] = await Promise.all([
+          prisma.userDocument.findFirst({ where: { secureFileReference: fileRef } }),
+          prisma.vehicleDocument.findFirst({
+            where: { secureFileReference: fileRef },
+            include: { vehicle: true },
+          }),
+        ]);
+
+        const ownsUserDoc = userDoc?.userId === req.user!.userId;
+        const ownsVehicleDoc = vehicleDoc?.vehicle.ownerId === req.user!.userId;
+
+        if (!ownsUserDoc && !ownsVehicleDoc) {
+          throw new AppError("You do not have access to this file", 403);
+        }
+      }
+
+      const filePath = path.join(env.uploadsDir, category, filename);
+      if (!fs.existsSync(filePath)) throw new AppError("File not found", 404);
+      res.sendFile(path.resolve(filePath));
+    });
   })
 );

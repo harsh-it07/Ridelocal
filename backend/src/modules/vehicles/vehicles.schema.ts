@@ -11,7 +11,7 @@ export const createVehicleSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   description: z.string().max(2000).optional(),
-  photoUrls: z.array(z.string().url()).max(10).default([]),
+  photoUrls: z.array(z.string().min(1)).max(10).default([]),
 });
 export type CreateVehicleInput = z.infer<typeof createVehicleSchema>;
 
