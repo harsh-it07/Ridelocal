@@ -4,7 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { Navbar } from "./components/Navbar";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
-import LineCursor from "./components/LineCursor";
+import CrosshairCursor from "./components/CrosshairCursor";
 
 import { LandingPage } from "./pages/public/LandingPage";
 import { LoginPage } from "./pages/public/LoginPage";
@@ -43,7 +43,7 @@ export default function App() {
         <BrowserRouter>
           <AuthProvider>
             <div className="flex min-h-screen flex-col">
-              <LineCursor />
+              <CrosshairCursor />
               <Navbar />
               <main className="flex-1">
               <Routes>

@@ -42,9 +42,27 @@ export function OwnerDashboardPage() {
       </div>
 
       {user?.verificationStatus !== "VERIFIED" && (
-        <div className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
-          Complete <Link to="/verification" className="font-semibold underline">owner verification</Link>{" "}
-          to get your vehicles approved faster.
+        <div className="mt-5 glass p-5 flex flex-col sm:flex-row items-center justify-between gap-4 border border-orange-500/20 relative overflow-hidden" style={{ background: 'rgba(249, 115, 22, 0.05)' }}>
+          {/* Subtle glow effect behind the text */}
+          <div className="absolute -left-20 -top-20 w-64 h-64 rounded-full pointer-events-none" style={{ background: 'rgba(249, 115, 22, 0.1)', filter: 'blur(80px)' }}></div>
+          
+          <div className="relative z-10 flex items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-[0_0_15px_rgba(249,115,22,0.2)]" style={{ background: 'rgba(249, 115, 22, 0.15)', color: '#fb923c' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-semibold text-ink-900 mb-1 text-base">Action Required: Verify Account</h3>
+              <p className="text-sm text-ink-500">
+                Complete <Link to="/verification" className="text-brand-600 font-semibold hover:text-orange-300 transition-colors hover:underline">owner verification</Link> to get your vehicles approved faster.
+              </p>
+            </div>
+          </div>
+          
+          <Link to="/verification" className="btn-primary shrink-0 relative z-10 !py-2.5 !px-5 shadow-[0_0_20px_rgba(249,115,22,0.3)]">
+            Verify Now
+          </Link>
         </div>
       )}
 

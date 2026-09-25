@@ -83,11 +83,6 @@ export function LoginPage() {
           </Link>
         </p>
 
-        <div className="mx-auto mt-6 max-w-md card p-5 text-sm text-ink-500">
-          Demo logins (seeded): <br />
-          customer@ridelocal.dev · owner@ridelocal.dev · admin@ridelocal.dev <br />
-          Password: <span className="font-mono text-ink-900">Password@123</span>
-        </div>
       </div>
     </div>
   );
