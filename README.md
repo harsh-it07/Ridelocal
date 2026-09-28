@@ -1,252 +1,621 @@
-# RideLocal v1.1
+# RideLocal — Peer-to-Peer Tourist Bike Rental Marketplace
 
-A tourist-first, location-aware peer-to-peer bike rental marketplace.
-**React + TypeScript + Tailwind** frontend, **Node.js + Express + TypeScript**
-backend, **PostgreSQL + Prisma** database. v1.1 is an upgrade of the original
-project — the schema, auth system, and API structure are preserved and
-extended, not replaced.
+<div align="center">
 
----
+![RideLocal Banner](https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1400&q=80)
 
-## What's new in v1.1
+**Making Jaipur Mobility Easy · Explore the Pink City on Two Wheels**
 
-1. **Glassmorphism design system** — white glass surfaces, warm orange
-   accents, restrained blur, smooth motion. Re-skinned globally through
-   `frontend/src/index.css`, plus bespoke rebuilds of the navbar, hero, and
-   a new role-picker auth landing page.
-2. **Mock payment system replacing the broken Razorpay-on-localhost flow** —
-   built on a `PaymentProvider` abstraction (`MockPaymentProvider` active,
-   `RazorpayProvider` implemented but dormant) so a real gateway can be
-   swapped in later with a one-line change.
-3. **Real secure file uploads** — driving licences, RC certificates, and
-   bike photos are now actually uploaded (drag/drop, progress, status),
-   stored outside any public static folder, and served through an
-   access-controlled endpoint (owner, document submitter, or admin only).
-4. **Dispute tickets** — a proper `Dispute` entity separate from the
-   refund flow, with customer/owner submission and an admin resolution
-   queue.
-5. **No Docker required** — the primary documented path uses a free
-   hosted Postgres instance (Neon/Supabase) instead of Docker Desktop.
-6. **Richer seed data** — 2 owners, 3 customers, 6 bikes spanning every
-   status, a completed booking with a review, an active booking with a
-   sample dispute, and a pending-payment booking.
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Express](https://img.shields.io/badge/Express-4.19-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.22-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/Vite-8.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+
+</div>
 
 ---
 
-## Project structure
+## 📖 Executive Summary
 
+**RideLocal** is a full-stack, tourist-first peer-to-peer bike and scooter rental marketplace purpose-built for the heritage city of Jaipur, Rajasthan. Traditional vehicle rentals in tourist hubs suffer from extortionate offline security deposits, non-transparent surge pricing, unverified identities, and lack of accountability. 
+
+RideLocal solves this through a digital escrow and verification platform connecting verified tourists directly with local bike owners. Backed by strict KYC identity checks, vehicle registration (RC) document audits, server-side anti-conflict reservation scheduling, and an extensible payment provider system, RideLocal guarantees safety, affordability, and seamless mobility.
+
+---
+
+## 📑 Table of Contents
+
+- [✨ Core Features](#-core-features)
+  - [👤 For Tourists (Customers)](#-for-tourists-customers)
+  - [🏍️ For Bike Owners (Hosts)](#️-for-bike-owners-hosts)
+  - [🛡️ For Platform Administrators](#️-for-platform-administrators)
+- [🎨 Design System & Aesthetics](#-design-system--aesthetics)
+- [🏗️ System Architecture](#️-system-architecture)
+  - [High-Level Topology](#high-level-topology)
+  - [Database Schema (Prisma)](#database-schema-prisma)
+  - [Core State Machines](#core-state-machines)
+- [🚀 Quick Start & Installation Guide](#-quick-start--installation-guide)
+  - [Prerequisites](#prerequisites)
+  - [1. Database Provisioning (Cloud / Local)](#1-database-provisioning-cloud--local)
+  - [2. Backend Setup](#2-backend-setup)
+  - [3. Frontend Setup](#3-frontend-setup)
+  - [4. Verification of Live Services](#4-verification-of-live-services)
+- [🔑 Pre-Configured Demo Accounts](#-pre-configured-demo-accounts)
+- [🔌 REST API Reference](#-rest-api-reference)
+- [🔐 Secure Document Upload & Storage Flow](#-secure-document-upload--storage-flow)
+- [💳 Modular Payment Engine](#-modular-payment-engine)
+- [⚙️ Environment Variables Reference](#️-environment-variables-reference)
+- [📁 Repository Directory Structure](#-repository-directory-structure)
+- [🤝 Contributing & License](#-contributing--license)
+
+---
+
+## ✨ Core Features
+
+### 👤 For Tourists (Customers)
+- **Geospatial & Semantic Search**:
+  - Filter by vehicle type: `MOTORCYCLE`, `SCOOTER`, `EBIKE`, `BICYCLE`.
+  - Filter by price per day, minimum rating, verified-only badge, and custom dates.
+  - Sort by proximity (`distance`), budget (`price`), feedback score (`rating`), or intelligent (`match`).
+  - Interactive Jaipur location radius query with MapLibre GL map visualization.
+- **Rich Two-Wheeler Profiles**:
+  - Multi-image photo galleries, brand and model specs, city hub location, and daily rates.
+  - Clear breakdown of daily rental rate, refundable security deposit, and 8% platform fee.
+  - Genuine reviews and 1-to-5 star ratings from verified past renters.
+- **Identity & KYC Verification**:
+  - Document upload portal for Indian or International Driving Licences and Government IDs (Aadhaar / Passport).
+  - Real-time verification status tracker (`UNVERIFIED` ➔ `UNDER_REVIEW` ➔ `VERIFIED` / `REJECTED`).
+- **Seamless Booking & Payment**:
+  - Anti-collision calendar booking: backend strictly forbids overlapping reservations.
+  - Multi-method mock payment gateway simulating realistic UPI (GPay, PhonePe, Paytm), Credit/Debit Card, Netbanking, and Wallets.
+  - Immediate booking confirmation and digital reservation pass.
+- **Trip Lifecycle & Handover Management**:
+  - Booking details page displaying pickup/return landmarks, owner contacts, and timing.
+  - Customer cancellation workflow with automated refund triggers.
+  - In-app ticket submission for booking disputes (fuel discrepancy, vehicle condition, deposit returns).
+  - Verified review submission upon ride completion.
+
+---
+
+### 🏍️ For Bike Owners (Hosts)
+- **Comprehensive Listing Studio**:
+  - Create and edit two-wheeler profiles with technical specifications, descriptions, and location pins.
+  - Upload real vehicle photos and mandatory RC (Registration Certificate) documents.
+  - Set custom daily rental rates and refundable security deposits.
+  - Submit listings to the admin queue (`DRAFT` ➔ `PENDING_REVIEW` ➔ `ACTIVE`).
+- **Dynamic Availability Calendar**:
+  - Define custom open rental schedules.
+  - Block maintenance slots or personal usage periods with zero reservation conflicts.
+- **Owner Command Center & Analytics**:
+  - Fleet management overview tracking all listed bikes and their current statuses.
+  - Live rental monitoring with current handover states and renter information.
+  - Financial overview showing gross rental volume, platform commissions, and net earnings.
+- **Dispute Participation**:
+  - Track customer-raised tickets and provide context directly to platform administrators.
+
+---
+
+### 🛡️ For Platform Administrators
+- **Verification Review Queue**:
+  - Inspect submitted user documents (driving licences, government IDs) with protected inline preview.
+  - Approve or reject verification requests with recorded audit logs and administrative notes.
+- **Vehicle Approval Pipeline**:
+  - Audit newly listed bikes and scooters against uploaded RC documents and photographs.
+  - One-click approval to publish vehicles to public search, or rejection with constructive feedback.
+- **User & Fleet Management**:
+  - Platform-wide user directory with role filters (`CUSTOMER`, `OWNER`, `ADMIN`).
+  - Account suspension toggle to immediately revoke access for malicious users.
+- **Operations & Ledger Monitoring**:
+  - **Booking Monitoring**: Live dashboard of all historic and ongoing trips across Jaipur.
+  - **Payment Monitoring**: Comprehensive financial ledger tracking transaction IDs, payment methods, amounts, and statuses.
+  - **Disputes & Refund Console**: Investigate grievances between renters and hosts, authorize deposit refunds, or close disputed tickets.
+
+---
+
+## 🎨 Design System & Aesthetics
+
+RideLocal features a **bespoke Crimson & Blush luxury palette** coupled with bold editorial typography inspired by the architectural grandeur of Rajasthan.
+
+| Token | Hex Value | Application |
+|---|---|---|
+| **Crimson 950** | `#360208` | Deepest shadows and contrasting overlays |
+| **Crimson 900** | `#4E050E` | Secondary dark background, hero strips, and footers |
+| **Crimson 800** | `#680A16` | **Primary background color** |
+| **Crimson 700** | `#821220` | Card borders and subtle separators |
+| **Blush 200** | `#F9D3CD` | **Primary text, high-contrast headings, and highlights** |
+| **Blush 400** | `#DFA8A0` | Secondary muted text, labels, and metadata |
+| **Blush 50** | `#FFFFFF` | Bright white accents, buttons, and badges |
+
+### Typography Hierarchy
+- **Headline Font**: `'Bebas Neue'`, `'Barlow Condensed'`, sans-serif — for monumental section titles, giant numbers, and brand marks.
+- **Display Font**: `'Barlow Condensed'`, `'DM Sans'`, sans-serif — for tags, tables, specs, and status banners.
+- **Body Font**: `'DM Sans'`, sans-serif — for readable paragraphs, descriptions, and input controls.
+
+### Micro-Interactions & Styling
+- **Custom Interactive Cursors**: Precision crosshair cursor and smooth line cursor for an immersive desktop experience.
+- **Editorial Presentation Frames**: Architectural corner markers, geometric grid lines, and high-contrast glassmorphism borders.
+- **Fluid Layout**: Fully responsive across mobile viewports, tablets, and ultra-wide desktop monitors.
+
+---
+
+## 🏗️ System Architecture
+
+### High-Level Topology
+
+```mermaid
+flowchart TB
+    subgraph Client["Frontend Layer (React 18 + Vite + Tailwind)"]
+        UI[Pages & Custom Components]
+        RQ[TanStack Query Cache]
+        AX[Axios API Client]
+        UI --> RQ --> AX
+    end
+
+    subgraph Server["Backend Layer (Node.js + Express + TypeScript)"]
+        RT[Express Routers & Middlewares]
+        MW_Auth[JWT Auth & RBAC Guard]
+        MW_Zod[Zod Schema Validation]
+        SVC[Business Service Layer]
+        PP[PaymentProvider Abstraction]
+        UP[Secure Upload Controller]
+
+        RT --> MW_Auth --> MW_Zod --> SVC
+        SVC --> PP
+        RT --> UP
+    end
+
+    subgraph Storage["Persistence & Filesystem"]
+        DB[(PostgreSQL Database via Prisma ORM)]
+        DISK[Access-Controlled Local Storage /uploads]
+    end
+
+    AX -- "HTTPS / Cookie Auth" --> RT
+    SVC --> DB
+    UP --> DISK
+    UP --> DB
 ```
-ridelocal/
-  backend/
-    prisma/schema.prisma
-    src/
-      modules/
-        auth, users, vehicles, availability, search, bookings,
-        payments/providers/  <- PaymentProvider abstraction
-        reviews, verification, disputes, uploads, admin
-      middleware/  auth.ts, errorHandler.ts, upload.ts
-  frontend/
-    src/
-      pages/{public,customer,owner,admin}
-      components/  Navbar, UploadArea, StatusBadge, VehicleCard, ui.tsx
-      context/AuthContext.tsx
+
+---
+
+### Database Schema (Prisma)
+
+```mermaid
+erDiagram
+    User ||--o{ Vehicle : "owns"
+    User ||--o{ Booking : "books"
+    User ||--o{ UserDocument : "submits"
+    User ||--o{ VerificationRecord : "targets"
+    User ||--o{ Review : "writes"
+    User ||--o{ Dispute : "raises"
+    User ||--o{ Notification : "receives"
+
+    Vehicle ||--o{ VehicleDocument : "has"
+    Vehicle ||--o{ Availability : "has_slots"
+    Vehicle ||--o{ Booking : "reserved_in"
+    Vehicle ||--o{ Review : "receives"
+
+    Booking ||--o{ Payment : "has_transactions"
+    Booking ||--o| Review : "yields"
+    Booking ||--o{ Dispute : "has_disputes"
 ```
 
 ---
 
-## 1. Database — no Docker needed
+### Core State Machines
 
-Create a free Postgres database at **https://neon.tech** or
-**https://supabase.com** (2 minutes, no card required), then copy the
-connection string it gives you.
+#### 1. Vehicle Lifecycle
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT : Owner creates listing
+    DRAFT --> PENDING_REVIEW : Uploads RC & photos, submits
+    PENDING_REVIEW --> ACTIVE : Admin approves
+    PENDING_REVIEW --> REJECTED : Admin rejects
+    REJECTED --> PENDING_REVIEW : Owner resubmits
+    ACTIVE --> SUSPENDED : Admin flag / Compliance issue
+    SUSPENDED --> ACTIVE : Reinstated
+```
 
-(If you'd rather run Postgres locally or via Docker, that still works —
-just point `DATABASE_URL` at it.)
+#### 2. Booking Lifecycle
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING_PAYMENT : Customer selects dates
+    PENDING_PAYMENT --> CONFIRMED : Payment processed
+    PENDING_PAYMENT --> PAYMENT_FAILED : Payment failure
+    PENDING_PAYMENT --> CANCELLED : Customer abandons
+    CONFIRMED --> ACTIVE : Handover & ride start
+    ACTIVE --> COMPLETED : Vehicle returned
+    CONFIRMED --> CANCELLED : Customer cancels before trip
+    ACTIVE --> DISPUTED : Dispute raised
+    CANCELLED --> REFUND_PENDING : Deposit / fee refund
+    REFUND_PENDING --> REFUNDED : Admin completes refund
+```
 
-## 2. Backend setup
+---
+
+## 🚀 Quick Start & Installation Guide
+
+### Prerequisites
+- **Node.js**: `v18.0.0` or higher (`v20+` recommended)
+- **Package Manager**: `npm` (`v9+`)
+- **Database**: PostgreSQL (Cloud hosted on [Neon](https://neon.tech) / [Supabase](https://supabase.com), or local PostgreSQL instance)
+
+---
+
+### 1. Database Provisioning (Cloud / Local)
+
+#### Option A: Free Hosted Cloud Database (Recommended — Zero Docker required)
+1. Sign up for a free PostgreSQL database at [Neon.tech](https://neon.tech) or [Supabase.com](https://supabase.com).
+2. Create a new project and copy your connection string (format: `postgresql://user:password@host:5432/dbname?sslmode=require`).
+
+#### Option B: Local PostgreSQL or Docker
+If you prefer running a local database instance via Docker:
+```bash
+docker run --name ridelocal-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ridelocal -p 5432:5432 -d postgres:15
+# Connection URL: postgresql://postgres:postgres@localhost:5432/ridelocal?schema=public
+```
+
+---
+
+### 2. Backend Setup
+
+Open a terminal in the project directory:
 
 ```bash
+# Navigate to backend
 cd backend
+
+# Copy environment configuration
 cp .env.example .env
-# paste your DATABASE_URL into .env
-npm install
-npm run prisma:migrate     # creates tables from prisma/schema.prisma
-npm run prisma:seed        # seeds demo accounts, bikes, bookings, disputes
-npm run dev                # http://localhost:4000
 ```
 
-Uploaded files are written to `backend/uploads/` (created automatically on
-first run) — never add this folder to a publicly served static path.
+Open `backend/.env` in your editor and configure your `DATABASE_URL`:
+```env
+DATABASE_URL="postgresql://<username>:<password>@<host>:5432/<database>?sslmode=require"
+PORT=4000
+NODE_ENV=development
+CLIENT_ORIGIN=http://localhost:5173
+JWT_SECRET="your-super-secure-random-secret-key"
+PLATFORM_FEE_PERCENT=8
+UPLOADS_DIR=./uploads
+MAX_UPLOAD_SIZE_MB=8
+```
 
-## 3. Frontend setup
+Install dependencies, run migrations, and populate seed data:
+```bash
+# Install backend dependencies
+npm install
 
-In a second terminal:
+# Push database schema migrations
+npm run prisma:migrate
+
+# Populate demo accounts, vehicles, bookings, disputes, and reviews
+npm run prisma:seed
+
+# Start backend development server (with hot reload via tsx watch)
+npm run dev
+```
+The backend API server will start on **`http://localhost:4000`**.
+
+---
+
+### 3. Frontend Setup
+
+In a separate terminal window:
 
 ```bash
+# Navigate to frontend
 cd frontend
+
+# Copy environment configuration
 cp .env.example .env
+```
+
+`frontend/.env` contains the default proxy target:
+```env
+VITE_API_BASE_URL=/api
+```
+
+Install dependencies and start the Vite dev server:
+```bash
+# Install frontend packages
 npm install
-npm run dev                # http://localhost:5173
+
+# Start Vite development server
+npm run dev
+```
+The client application will launch on **`http://localhost:5173`**.
+
+> **Note on Vite Proxy**: The frontend dev server proxies all `/api/*` network requests directly to `http://localhost:4000`. Authentication cookies and file streaming seamlessly pass through the proxy with zero CORS configuration required.
+
+---
+
+### 4. Verification of Live Services
+
+- **Backend Health Check**: Open `http://localhost:4000/api/health` in your browser. You should receive:
+  ```json
+  { "status": "ok", "time": "2026-..." }
+  ```
+- **Prisma Studio (Optional Data Explorer)**: Run `npm run prisma:studio` inside `backend/` to view and query database records via an interactive web GUI at `http://localhost:5555`.
+
+---
+
+## 🔑 Pre-Configured Demo Accounts
+
+All pre-seeded demo accounts share the universal password:  
+**`Password@123`**
+
+| Role | Email Address | Verification Status | Pre-Configured Context |
+|---|---|---|---|
+| **Platform Admin** | `admin@ridelocal.dev` | `VERIFIED` | Full access to moderation queues, user controls, disputes, and approvals |
+| **Verified Owner** | `owner@ridelocal.dev` | `VERIFIED` | Owns 3 live bikes (Activa 6G, Classic 350, TVS iQube), earnings history, active rental |
+| **Pending Owner** | `owner2@ridelocal.dev` | `UNDER_REVIEW` | Owns 3 bikes across `DRAFT`, `PENDING_REVIEW` (Pulsar NS200), and `REJECTED` states |
+| **Verified Tourist** | `customer@ridelocal.dev` | `VERIFIED` | Has a completed rental with a review + an active rental with a raised dispute |
+| **Pending Tourist** | `customer2@ridelocal.dev` | `UNDER_REVIEW` | Submitted driving licence, pending in Admin Verification Queue |
+| **Unverified Tourist**| `customer3@ridelocal.dev` | `UNVERIFIED` | Fresh account with a booking currently awaiting checkout payment |
+
+> [!IMPORTANT]
+> **Admin Account Security**: Platform Administrator accounts cannot be created via the public registration endpoint. Registration is restricted server-side to `CUSTOMER` and `OWNER` roles. Administrative users must be created through database seeding or direct DB administrator insertion.
+
+---
+
+## 🔌 REST API Reference
+
+All protected endpoints require a valid HTTP-only `auth_token` cookie or Bearer JWT token in the request header.
+
+### 1. Authentication (`/api/auth`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Public | Register new user (`role`: `CUSTOMER` or `OWNER`) |
+| `POST` | `/api/auth/login` | Public | Authenticate user and issue JWT cookie |
+| `POST` | `/api/auth/logout` | Authenticated | Invalidate authentication cookie |
+| `GET` | `/api/auth/me` | Authenticated | Retrieve current user profile and session data |
+
+### 2. Vehicle Search & Catalog (`/api/search` & `/api/vehicles`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/search/vehicles` | Public | Search vehicles by lat/lng, radius, dates, price, and category |
+| `GET` | `/api/vehicles/:id` | Public | Fetch comprehensive vehicle details, specs, and owner info |
+| `POST` | `/api/vehicles` | Owner | Create new vehicle draft listing |
+| `PATCH` | `/api/vehicles/:id` | Owner | Update draft or existing vehicle details |
+| `POST` | `/api/vehicles/:id/submit`| Owner | Submit vehicle listing for admin review |
+| `GET` | `/api/vehicles/mine` | Owner | List all vehicles owned by current user |
+| `DELETE`| `/api/vehicles/:id` | Owner | Remove an unbooked vehicle listing |
+
+### 3. Availability Calendar (`/api/vehicles/:id/availability`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/vehicles/:id/availability` | Public | Get open and blocked time slots for vehicle |
+| `POST` | `/api/vehicles/:id/availability` | Owner | Block out dates for maintenance or owner use |
+| `DELETE`| `/api/vehicles/:id/availability/:slotId` | Owner | Release a previously blocked date slot |
+
+### 4. Bookings Engine (`/api/bookings`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/bookings` | Customer | Reserve vehicle (calculates rental, deposit, platform fee) |
+| `GET` | `/api/bookings` | Authenticated | List all bookings for customer or owner |
+| `GET` | `/api/bookings/:id` | Authenticated | Get full booking receipt, status, and breakdown |
+| `POST` | `/api/bookings/:id/cancel` | Customer | Cancel a booking with reason |
+
+### 5. Payments (`/api/payments`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/payments/mock/create` | Customer | Initialize payment order (`PROCESSING` state) |
+| `POST` | `/api/payments/mock/confirm` | Customer | Confirm transaction, mark `PAID`, advance booking to `CONFIRMED` |
+
+### 6. KYC & Document Verification (`/api/verification`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/verification/submit` | Authenticated | Submit driving licence or RC document references |
+| `GET` | `/api/verification/status` | Authenticated | Retrieve verification history and status for current user |
+
+### 7. Reviews & Ratings (`/api/reviews`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/reviews` | Customer | Submit 1–5 star review and comment for completed rental |
+| `GET` | `/api/reviews/vehicle/:vehicleId` | Public | List all reviews and ratings for a bike |
+
+### 8. Disputes & Claims (`/api/disputes`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/disputes` | Customer / Owner | Open a dispute ticket regarding a booking |
+| `GET` | `/api/disputes/mine` | Authenticated | List all disputes relevant to current user |
+
+### 9. Secure File Uploads (`/api/uploads`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/uploads/:category` | Authenticated | Upload document/photo (`user-docs`, `vehicle-docs`, `bike-images`) |
+| `GET` | `/api/uploads/file/:category/:filename` | Controlled | Secure stream of uploaded file (ACL enforced) |
+
+### 10. Platform Administration (`/api/admin`)
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/admin/verifications` | Admin | Fetch user and vehicle verification queue |
+| `PATCH` | `/api/admin/verifications/:id` | Admin | Approve or reject identity verification with notes |
+| `GET` | `/api/admin/vehicles/pending` | Admin | Fetch pending vehicle listing submissions |
+| `PATCH` | `/api/admin/vehicles/:id/approve` | Admin | Approve or reject bike listing |
+| `GET` | `/api/admin/users` | Admin | Query platform users with optional role filter |
+| `PATCH` | `/api/admin/users/:id/status` | Admin | Toggle user account suspension |
+| `GET` | `/api/admin/bookings` | Admin | Monitor all platform bookings and statuses |
+| `GET` | `/api/admin/payments` | Admin | Monitor global payment transactions and escrow |
+| `PATCH` | `/api/admin/bookings/:id/refund` | Admin | Authorize or reject customer deposit/rental refunds |
+| `GET` | `/api/admin/disputes` | Admin | List all open dispute tickets |
+| `PATCH` | `/api/admin/disputes/:id` | Admin | Update dispute state (`RESOLVED`, `CLOSED`) with resolution notes |
+
+---
+
+## 🔐 Secure Document Upload & Storage Flow
+
+Driving licences and vehicle RC papers contain sensitive Personally Identifiable Information (PII). RideLocal implements an **Access Control List (ACL) file vault**:
+
+```
+[Client Drag & Drop] 
+       │
+       ▼
+POST /api/uploads/:category
+       │
+       ├─► Validates MIME type (image/jpeg, image/png, application/pdf)
+       ├─► Checks file size (<= 8 MB)
+       ├─► Writes to backend/uploads/:category with UUID filename
+       └─► Returns secure reference: local://:category/:filename
+       │
+       ▼
+POST /api/verification/submit
+       │
+       └─► Attaches fileRef to UserDocument or VehicleDocument record
 ```
 
-The Vite dev server proxies `/api/*` to the backend, so open
-http://localhost:5173 and everything just works — including file downloads,
-since the auth cookie is shared across the proxy.
+### Access-Controlled File Retrieval:
+When requesting `GET /api/uploads/file/:category/:filename`:
+1. **Public Vehicle Photos** (`bike-images`): Streamed freely to display bike galleries in search.
+2. **Sensitive KYC Documents** (`user-docs`, `vehicle-docs`): The backend verifies authentication and strictly checks:
+   - Is the requester the **document submitter**?
+   - Is the requester the **vehicle owner**?
+   - Is the requester a **Platform Administrator**?
+   
+If none match, the server returns an immediate `403 Forbidden`. **Files are never exposed to public static web directories.**
 
 ---
 
-## Demo accounts (password for all: `Password@123`)
+## 💳 Modular Payment Engine
 
-| Role     | Email                    | Notes                                              |
-|----------|--------------------------|-----------------------------------------------------|
-| Admin    | admin@ridelocal.dev      | Full platform access                                |
-| Owner    | owner@ridelocal.dev      | Verified, 3 active bikes                            |
-| Owner    | owner2@ridelocal.dev     | Under review, bikes in draft/pending/rejected       |
-| Customer | customer@ridelocal.dev   | Verified, has a completed + an active booking       |
-| Customer | customer2@ridelocal.dev  | Licence submitted, awaiting admin review            |
-| Customer | customer3@ridelocal.dev  | Unverified, has a booking awaiting payment          |
+RideLocal utilizes a **Provider Strategy Pattern** for financial transactions:
 
-Admin accounts are **never** created through public signup — the register
-endpoint only accepts `CUSTOMER`/`OWNER`, enforced server-side. The
-"Admin Access" card on `/get-started` routes straight to login with a
-banner explaining this, not a signup form.
-
----
-
-## Architecture
-
-**Request flow:** `Frontend → Axios client → Express routes → Zod
-validation → service layer → Prisma → PostgreSQL`. Prices, availability
-conflicts, and payment confirmation are always computed/verified
-server-side; the frontend only ever shows estimates before submit.
-
-**Payment abstraction:**
 ```
-PaymentService (payments.service.ts)
-├── MockPaymentProvider   <- active in v1.1, no external calls
-└── RazorpayProvider      <- implemented, dormant; swap in payments.service.ts
+                  ┌──────────────────────┐
+                  │    PaymentService    │
+                  └──────────┬───────────┘
+                             │
+            ┌────────────────┴────────────────┐
+            ▼                                 ▼
+┌───────────────────────┐         ┌───────────────────────┐
+│  MockPaymentProvider  │         │   RazorpayProvider    │
+│  (Active by Default)  │         │ (Enterprise / Dormant)│
+└───────────────────────┘         └───────────────────────┘
 ```
-Both implement the same `PaymentProvider` interface (`createCharge` /
-`confirmCharge`), so nothing else in the codebase needs to know which
-gateway is active.
 
-**File uploads:** `POST /api/uploads/:category` (multer, local disk,
-JPG/PNG/PDF only, size-limited) returns a `fileRef`. That ref is then
-attached to a `UserDocument` or `VehicleDocument` row via
-`/api/verification/submit`. Downloads go through
-`GET /api/uploads/file/:category/:filename`, which checks the requester is
-the document's owner, the vehicle's owner, or an admin before streaming
-the file — nothing is reachable by a guessed URL alone.
+- **Mock Payment Provider (Active)**: Zero external credentials needed. Fully simulates transaction lifecycles, creates genuine database `Payment` records in `PROCESSING` and `PAID` states, and supports UPI, Card, Netbanking, and Wallets.
+- **Razorpay Provider (Ready for Production)**: Pre-architected and ready for activation. To switch to live Razorpay processing, supply `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in `backend/.env` and update the active provider registration in `payments.service.ts`.
 
 ---
 
-## Database schema (v1.1 additions)
+## ⚙️ Environment Variables Reference
 
-Existing entities (`User`, `Vehicle`, `UserDocument`, `VehicleDocument`,
-`Availability`, `Booking`, `Payment`, `Review`, `VerificationRecord`,
-`Notification`) are preserved. New in v1.1:
+### Backend (`backend/.env`)
 
-- **`Dispute`** — `bookingId`, `raisedById`, `subject`, `description`,
-  `status` (`OPEN → UNDER_REVIEW → RESOLVED/CLOSED`), `resolutionNote`,
-  `resolvedById`.
-- **`PaymentProvider` enum** (`MOCK` / `RAZORPAY`) and new `Payment`
-  fields: `provider`, `method`, `transactionId`.
-- **`PaymentStatus` cleaned up** to `PENDING / PROCESSING / PAID / FAILED /
-  REFUNDED` (previously Razorpay-specific `CREATED/AUTHORIZED/CAPTURED`).
+| Variable | Type | Default | Description |
+|---|---|---|---|
+| `DATABASE_URL` | String | *(Required)* | PostgreSQL connection URI (Neon, Supabase, or Local) |
+| `PORT` | Number | `4000` | HTTP port backend server listens on |
+| `NODE_ENV` | String | `development` | Runtime environment (`development` / `production`) |
+| `CLIENT_ORIGIN` | String | `http://localhost:5173`| Allowed CORS origin for browser requests |
+| `JWT_SECRET` | String | *(Required)* | Secret key used to sign and verify JWT session cookies |
+| `JWT_EXPIRES_IN` | String | `7d` | Token expiry duration |
+| `PLATFORM_FEE_PERCENT`| Number | `8` | Marketplace commission percentage added to rental total |
+| `UPLOADS_DIR` | String | `./uploads` | Local directory for uploaded files and KYC vault |
+| `MAX_UPLOAD_SIZE_MB` | Number | `8` | Maximum allowable single file size in megabytes |
+| `RAZORPAY_KEY_ID` | String | *(Optional)* | Razorpay gateway API key (for live mode) |
+| `RAZORPAY_KEY_SECRET` | String | *(Optional)* | Razorpay gateway secret (for live mode) |
+| `RAZORPAY_WEBHOOK_SECRET` | String | *(Optional)* | Razorpay webhook secret |
 
-`Vehicle` was **not** renamed to `Bike` — that would touch ~30 files for
-no functional gain. All user-facing copy says "bike"; the model/API name
-stays `Vehicle` internally. This is a deliberate scope decision, noted
-under Limitations below.
+### Frontend (`frontend/.env`)
 
----
-
-## Flows
-
-**Authentication:** `/get-started` presents three entry points (Rent a
-Bike / List Your Bike / Admin Access) → routes to `/register?role=...` or
-`/login`. Registration only allows `CUSTOMER`/`OWNER`.
-
-**Tourist flow:** Register → browse `/search` → view a bike →
-(if unverified) prompted to upload a driving licence at `/verification` →
-book → `/bookings/:id/pay` mock checkout (UPI/Card/Netbanking/Wallet →
-processing → success) → booking `CONFIRMED`.
-
-**Owner flow:** Register as owner → `/owner/vehicles/new` (draft) → upload
-RC certificate + photos → submit for approval → admin approves → bike
-appears in public search.
-
-**Verification flow:** Any document upload creates a `VerificationRecord`
-in `UNDER_REVIEW`. Admin approves/rejects at `/admin/verifications`
-(users) or `/admin/vehicles` (bikes), with the actual uploaded file
-viewable inline via the access-controlled download route.
-
-**Booking flow:** Server checks vehicle is `ACTIVE` + `VERIFIED`, customer
-is `VERIFIED` and not suspended, and no overlapping booking exists —
-before ever calculating a price. Price is always server-computed.
-
-**Mock payment flow:** `POST /payments/mock/create` creates a real
-`Payment` row (`PROCESSING`) via `MockPaymentProvider` →
-`POST /payments/mock/confirm` marks it `PAID` and the booking `CONFIRMED`
-— both are real backend writes, never faked on the frontend.
+| Variable | Type | Default | Description |
+|---|---|---|---|
+| `VITE_API_BASE_URL` | String | `/api` | Base path for API requests (proxied to backend) |
+| `VITE_RAZORPAY_KEY_ID` | String | *(Optional)* | Client-side Razorpay public key (if enabled) |
 
 ---
 
-## API endpoints
+## 📁 Repository Directory Structure
 
-**Auth:** `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`
-
-**Bikes (customer-facing):** `GET /search/vehicles`, `GET /vehicles/:id`
-
-**Bikes (owner):** `POST /vehicles`, `PATCH /vehicles/:id`, `POST /vehicles/:id/submit`, `GET /vehicles/mine`, `DELETE /vehicles/:id`
-
-**Availability:** `GET|POST /vehicles/:id/availability`, `DELETE /vehicles/:id/availability/:slotId`
-
-**Bookings:** `POST /bookings`, `GET /bookings`, `GET /bookings/:id`, `POST /bookings/:id/cancel`
-
-**Payments:** `POST /payments/mock/create`, `POST /payments/mock/confirm`
-
-**Reviews:** `POST /reviews`, `GET /reviews/vehicle/:vehicleId`
-
-**Verification:** `POST /verification/submit`, `GET /verification/status`
-
-**Disputes:** `POST /disputes`, `GET /disputes/mine`
-
-**Uploads:** `POST /uploads/:category`, `GET /uploads/file/:category/:filename`
-
-**Admin:** `GET /admin/verifications`, `PATCH /admin/verifications/:id`,
-`GET /admin/vehicles/pending`, `PATCH /admin/vehicles/:id/approve`,
-`GET /admin/users`, `PATCH /admin/users/:id/status`,
-`GET /admin/bookings`, `GET /admin/payments`,
-`PATCH /admin/bookings/:id/refund`,
-`GET /admin/disputes`, `PATCH /admin/disputes/:id`
+```text
+ridelocal/
+├── backend/
+│   ├── prisma/
+│   │   ├── migrations/             # Timestamped SQL database migrations
+│   │   ├── schema.prisma           # Prisma models, relations, and enums
+│   │   └── seed.ts                 # Database seeder (demo accounts, bikes, bookings)
+│   ├── src/
+│   │   ├── config/                 # Environment validation and Prisma client instance
+│   │   ├── middleware/             # JWT auth, role guard, error handler, Multer upload
+│   │   ├── modules/
+│   │   │   ├── admin/              # Verifications, vehicle approvals, user status
+│   │   │   ├── auth/               # Register, login, logout, me
+│   │   │   ├── availability/       # Date range booking conflict validation
+│   │   │   ├── bookings/           # Booking creation, lifecycle, and pricing logic
+│   │   │   ├── disputes/           # Complaint tickets and admin resolution
+│   │   │   ├── payments/           # Modular PaymentService & provider drivers
+│   │   │   │   └── providers/      # MockPaymentProvider, RazorpayProvider
+│   │   │   ├── reviews/            # Verified customer ratings and feedback
+│   │   │   ├── search/             # Geospatial and multi-attribute bike discovery
+│   │   │   ├── uploads/            # Multipart file handler & access-controlled streaming
+│   │   │   ├── users/              # User profile endpoints
+│   │   │   └── vehicles/           # Bike listing CRUD, specs, and owner management
+│   │   ├── utils/                  # Async handler wrappers, HTTP error classes
+│   │   ├── app.ts                  # Express application configuration and middleware stack
+│   │   └── index.ts                # HTTP server bootstrap entry point
+│   ├── .env.example                # Backend environment template
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend/
+│   ├── public/                     # Static icons and assets
+│   ├── src/
+│   │   ├── components/             # Reusable UI components
+│   │   │   ├── CrosshairCursor.tsx # Precision cursor micro-interaction
+│   │   │   ├── LineCursor.tsx      # Smooth accent line follower
+│   │   │   ├── Loader.tsx          # Custom animated loader
+│   │   │   ├── Navbar.tsx          # Multi-role responsive navigation bar
+│   │   │   ├── ReviewsSection.tsx  # Dynamic reviews and rating submission form
+│   │   │   ├── StatusBadge.tsx     # Colored pill badges for statuses
+│   │   │   ├── ui.tsx              # Input, button, select primitives
+│   │   │   ├── UploadArea.tsx      # Drag & drop file upload with progress indicator
+│   │   │   ├── VehicleCard.tsx     # Vehicle catalog item card
+│   │   │   └── VehicleGallery.tsx  # Interactive multi-image photo gallery
+│   │   ├── context/
+│   │   │   ├── AuthContext.tsx     # User authentication state & session provider
+│   │   │   └── ThemeContext.tsx    # Theme provider
+│   │   ├── pages/
+│   │   │   ├── admin/              # AdminDashboard, Monitoring, Approvals, Users
+│   │   │   ├── customer/           # SearchPage, VehicleDetails, Payment, Bookings
+│   │   │   ├── owner/              # OwnerDashboard, VehicleForm, Availability, Earnings
+│   │   │   └── public/             # LandingPage, GetStarted, LoginPage, RegisterPage
+│   │   ├── routes/
+│   │   │   └── ProtectedRoute.tsx  # Role-based route authorization guard
+│   │   ├── App.tsx                 # Client routing table and theme provider
+│   │   ├── index.css               # Crimson & Blush design tokens, utility classes
+│   │   └── main.tsx                # React DOM entry point
+│   ├── .env.example                # Frontend environment template
+│   ├── index.html                  # HTML5 entry with Google Fonts preconnect
+│   ├── package.json
+│   ├── tailwind.config.js          # Custom colors, typography, and theme extensions
+│   ├── tsconfig.json
+│   └── vite.config.ts              # Vite server & API proxy configuration
+│
+└── README.md                       # Comprehensive project documentation
+```
 
 ---
 
-## Environment variables
+## 🤝 Contributing & License
 
-See `backend/.env.example` and `frontend/.env.example`. No Razorpay keys
-are required in v1.1 — they're only read if `RazorpayProvider` is
-manually swapped in later.
+Contributions, feedback, and issue reports are warmly welcomed!
+
+1. Fork the repository.
+2. Create your feature branch (`git checkout -b feature/amazing-feature`).
+3. Commit your changes (`git commit -m "feat: add amazing feature"`).
+4. Push to your branch (`git push origin feature/amazing-feature`).
+5. Open a Pull Request.
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
 ---
 
-## Assumptions & limitations (being upfront about scope)
-
-- `Vehicle` was kept as the internal model/API name rather than renamed to
-  `Bike` (see above) — a naming choice, not a missing feature.
-- No live GPS tracking or websockets — "Active Rentals" status lives on
-  the `Booking`/`Vehicle` records and is viewed via normal polling
-  (refetch on page load), per the brief's guidance that this is
-  acceptable for v1.1.
-- The admin panel is a set of focused pages (dashboard, verification
-  queue, vehicle approval, users, bookings, payments, disputes) rather
-  than a full sidebar-shell application shell — functionally complete,
-  visually simpler than a bespoke admin layout would be.
-- A file uploaded via `/api/uploads/:category` isn't downloadable until
-  it's attached to a `UserDocument`/`VehicleDocument` via
-  `/verification/submit` — by design, so stray uploads aren't guessable,
-  but it means there's a brief window between upload and attachment.
-- Bike photo gallery reordering/removal in the owner form isn't built —
-  photos upload and queue for submission, but can't be reordered before
-  submit.
+<div align="center">
+  <b>RideLocal</b> · Designed and Engineered for Jaipur, Rajasthan 🇮🇳<br>
+  <sub>Empowering Local Bike Owners · Providing Unmatched Freedom to Travelers</sub>
+</div>
