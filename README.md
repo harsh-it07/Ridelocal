@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![RideLocal Banner](https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1400&q=80)
+![RideLocal Banner](./Ridelocal-logo.png)
 
 **Making Jaipur Mobility Easy · Explore the Pink City on Two Wheels**
 
