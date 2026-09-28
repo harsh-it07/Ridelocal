@@ -45,7 +45,7 @@ const SEEDED_REVIEWS_MAP: Record<string, ReviewItem[]> = {
       id: "seed-rev-2",
       rating: 5,
       comment:
-        "One of the best rental experiences in Jaipur! Pickup was seamless right near the railway station. Tank was full and two clean ISI helmets were provided.",
+        "One of the best rental experiences in Jaipur! Pickup was seamless right near the railway station. Tank was full and two clean helmets were provided.",
       createdAt: new Date(Date.now() - 5 * 86400000).toISOString(),
       customer: { name: "Priya Sharma" },
       tags: ["Punctual handover", "Good helmets", "Polite owner"],
@@ -77,49 +77,16 @@ const SEEDED_REVIEWS_MAP: Record<string, ReviewItem[]> = {
   ],
 };
 
-function StarIcon({ filled, half = false, className = "w-4 h-4" }: { filled: boolean; half?: boolean; className?: string }) {
-  if (half) {
-    return (
-      <svg className={`${className} text-amber-400`} viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-      </svg>
-    );
-  }
+function StarRating({ rating }: { rating: number }) {
   return (
-    <svg
-      className={`${className} ${filled ? "text-amber-400 fill-amber-400" : "text-neutral-600 fill-transparent"}`}
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={filled ? 0 : 1.5}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-    </svg>
-  );
-}
-
-function StarRating({ rating, size = "w-4 h-4" }: { rating: number; size?: string }) {
-  return (
-    <div className="flex items-center gap-0.5">
+    <div style={{ display: "inline-flex", gap: "2px", color: "#F9D3CD" }}>
       {[1, 2, 3, 4, 5].map((star) => (
-        <StarIcon key={star} filled={star <= Math.round(rating)} className={size} />
+        <span key={star} style={{ fontSize: "0.875rem" }}>
+          {star <= Math.round(rating) ? "★" : "☆"}
+        </span>
       ))}
     </div>
   );
-}
-
-function getAvatarColor(name: string): string {
-  const colors = [
-    "from-orange-500 to-amber-600",
-    "from-purple-500 to-indigo-600",
-    "from-emerald-500 to-teal-600",
-    "from-blue-500 to-cyan-600",
-    "from-rose-500 to-pink-600",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
 }
 
 export function ReviewsSection({
@@ -138,7 +105,6 @@ export function ReviewsSection({
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Combine real reviews with sample verified reviews if database has few
   const baseReviews: ReviewItem[] =
     serverReviews && serverReviews.length > 0
       ? serverReviews.map((r, i) => ({
@@ -158,26 +124,15 @@ export function ReviewsSection({
   // Review Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalRating, setModalRating] = useState(5);
-  const [modalHoverRating, setModalHoverRating] = useState<number | null>(null);
   const [modalComment, setModalComment] = useState("");
   const [modalSelectedTags, setModalSelectedTags] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Distribution calculations
   const totalReviews = Math.max(ratingCount, reviews.length);
   const effectiveAvg = ratingAvg > 0 ? ratingAvg : 4.8;
 
-  const countsByStar = {
-    5: Math.round(totalReviews * 0.75),
-    4: Math.round(totalReviews * 0.18),
-    3: Math.max(1, Math.round(totalReviews * 0.05)),
-    2: Math.round(totalReviews * 0.01),
-    1: Math.round(totalReviews * 0.01),
-  };
-
-  // Filter & Sort reviews
   const filteredReviews = reviews
     .filter((r) => {
       if (selectedStarFilter !== "ALL" && r.rating !== selectedStarFilter) return false;
@@ -224,9 +179,10 @@ export function ReviewsSection({
     setSubmitting(true);
 
     try {
-      const fullComment = modalSelectedTags.length > 0
-        ? `${modalComment.trim()}\n\nHighlights: ${modalSelectedTags.join(", ")}`
-        : modalComment.trim();
+      const fullComment =
+        modalSelectedTags.length > 0
+          ? `${modalComment.trim()}\n\nHighlights: ${modalSelectedTags.join(", ")}`
+          : modalComment.trim();
 
       const { data } = await api.post("/reviews", {
         vehicleId,
@@ -235,7 +191,7 @@ export function ReviewsSection({
       });
 
       const newReview: ReviewItem = {
-        id: data.review.id || `user-rev-${Date.now()}`,
+        id: data.review?.id || `user-rev-${Date.now()}`,
         rating: modalRating,
         comment: modalComment.trim() || undefined,
         createdAt: new Date().toISOString(),
@@ -262,30 +218,26 @@ export function ReviewsSection({
     }
   }
 
-  const RATING_LABELS: Record<number, string> = {
-    1: "1 Star — Terrible experience",
-    2: "2 Stars — Poor condition",
-    3: "3 Stars — Average ride",
-    4: "4 Stars — Very good & smooth!",
-    5: "5 Stars — Outstanding trip!",
-  };
-
-  const currentDisplayRating = modalHoverRating !== null ? modalHoverRating : modalRating;
-
   return (
-    <div className="card mt-6 p-6">
-      {/* Header and Add Review CTA */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-glass-border pb-6">
+    <div style={{ marginTop: "72px", borderTop: "1px solid rgba(249, 211, 205, 0.3)", paddingTop: "48px" }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "20px" }}>
         <div>
-          <div className="flex items-center gap-3">
-            <h2 className="font-display text-2xl font-bold text-ink-900">Rider Reviews</h2>
-            <span className="rounded-full bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-400 border border-brand-500/20">
-              {totalReviews} Verified
-            </span>
-          </div>
-          <p className="mt-1 text-sm text-ink-500">
-            Real feedback from verified riders who rented this vehicle on RideLocal.
+          <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+            AUTHENTIC FEEDBACK
           </p>
+          <h2
+            style={{
+              fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+              fontSize: "2.75rem",
+              color: "#F9D3CD",
+              textTransform: "uppercase",
+              letterSpacing: "0.01em",
+              margin: "4px 0 0",
+            }}
+          >
+            RIDER REVIEWS
+          </h2>
         </div>
 
         <button
@@ -297,139 +249,67 @@ export function ReviewsSection({
             }
             setIsModalOpen(true);
           }}
-          className="btn-primary inline-flex items-center gap-2 !py-2.5 !px-5 text-sm shrink-0"
+          className="btn-primary"
+          style={{ padding: "14px 28px", fontSize: "0.9375rem" }}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-          <span>Write a Review</span>
+          Write a Review →
         </button>
       </div>
 
-      {/* Ratings Overview Grid */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center rounded-2xl bg-glass-surface p-5 border border-glass-border">
-        {/* Big Score Box */}
-        <div className="md:col-span-4 flex flex-col items-center justify-center text-center p-4 border-b md:border-b-0 md:border-r border-glass-border">
-          <div className="font-display text-5xl font-black text-ink-900 tracking-tight">
+      {/* Ratings summary strip */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto 1fr",
+          gap: "48px",
+          alignItems: "center",
+          marginTop: "32px",
+          padding: "24px 0",
+          borderTop: "1px solid rgba(249, 211, 205, 0.2)",
+          borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+        }}
+      >
+        <div>
+          <span style={{ fontFamily: "'Bebas Neue'", fontSize: "4rem", color: "#F9D3CD", lineHeight: 1 }}>
             {effectiveAvg.toFixed(1)}
+          </span>
+          <div style={{ marginTop: "4px" }}>
+            <StarRating rating={effectiveAvg} />
           </div>
-          <div className="mt-2">
-            <StarRating rating={effectiveAvg} size="w-5 h-5" />
-          </div>
-          <p className="mt-2 text-xs text-ink-500">
-            Based on <span className="font-semibold text-ink-900">{totalReviews}</span> verified rider experiences
+          <p style={{ fontSize: "0.875rem", color: "#F0C4BC", marginTop: "6px", fontWeight: 600 }}>
+            {totalReviews} verified trips
           </p>
         </div>
 
-        {/* Star Distribution Bars */}
-        <div className="md:col-span-8 space-y-2">
-          {([5, 4, 3, 2, 1] as const).map((stars) => {
-            const count = countsByStar[stars];
-            const pct = Math.round((count / totalReviews) * 100);
-            const isSelected = selectedStarFilter === stars;
-            return (
+        {/* Filter bar */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", alignItems: "center", justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", gap: "6px" }}>
+            {(["ALL", 5, 4, 3] as const).map((star) => (
               <button
-                key={stars}
+                key={star}
                 type="button"
-                onClick={() => setSelectedStarFilter(isSelected ? "ALL" : stars)}
-                className={`flex w-full items-center gap-3 rounded-lg px-2 py-1 text-xs transition-colors ${
-                  isSelected ? "bg-brand-500/20 ring-1 ring-brand-500/40" : "hover:bg-white/5"
-                }`}
+                onClick={() => setSelectedStarFilter(star)}
+                style={{
+                  padding: "8px 14px",
+                  fontSize: "0.8125rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  backgroundColor: selectedStarFilter === star ? "#F9D3CD" : "transparent",
+                  color: selectedStarFilter === star ? "#680A16" : "#F0C4BC",
+                  border: "1px solid rgba(249, 211, 205, 0.3)",
+                  cursor: "pointer",
+                }}
               >
-                <div className="flex w-14 items-center justify-end gap-1 shrink-0 font-medium text-ink-700">
-                  <span>{stars}</span>
-                  <span className="text-amber-400">★</span>
-                </div>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-800">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-amber-400 to-brand-500 transition-all duration-500"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-                <span className="w-12 text-right font-medium text-ink-500 shrink-0">{pct}%</span>
+                {star === "ALL" ? "All" : `${star}★`}
               </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Category Performance Badges */}
-      <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="rounded-xl border border-glass-border bg-glass-surface p-3 text-center">
-          <p className="text-[11px] text-ink-500 font-medium">Vehicle Condition</p>
-          <p className="mt-1 text-sm font-bold text-ink-900 flex items-center justify-center gap-1">
-            <span>4.9</span>
-            <span className="text-amber-400 text-xs">★</span>
-          </p>
-        </div>
-        <div className="rounded-xl border border-glass-border bg-glass-surface p-3 text-center">
-          <p className="text-[11px] text-ink-500 font-medium">Pickup & Handover</p>
-          <p className="mt-1 text-sm font-bold text-ink-900 flex items-center justify-center gap-1">
-            <span>4.8</span>
-            <span className="text-amber-400 text-xs">★</span>
-          </p>
-        </div>
-        <div className="rounded-xl border border-glass-border bg-glass-surface p-3 text-center">
-          <p className="text-[11px] text-ink-500 font-medium">Cleanliness</p>
-          <p className="mt-1 text-sm font-bold text-ink-900 flex items-center justify-center gap-1">
-            <span>4.9</span>
-            <span className="text-amber-400 text-xs">★</span>
-          </p>
-        </div>
-        <div className="rounded-xl border border-glass-border bg-glass-surface p-3 text-center">
-          <p className="text-[11px] text-ink-500 font-medium">Owner Response</p>
-          <p className="mt-1 text-sm font-bold text-ink-900 flex items-center justify-center gap-1">
-            <span>5.0</span>
-            <span className="text-amber-400 text-xs">★</span>
-          </p>
-        </div>
-      </div>
-
-      {/* Filters & Search Controls */}
-      <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-glass-border pb-4">
-        {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
-          {(["ALL", 5, 4, 3] as const).map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => setSelectedStarFilter(filter)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${
-                selectedStarFilter === filter
-                  ? "bg-brand-600 text-white shadow-sm"
-                  : "bg-glass-surface border border-glass-border text-ink-600 hover:text-ink-900"
-              }`}
-            >
-              {filter === "ALL" ? `All (${reviews.length})` : `${filter} Stars ★`}
-            </button>
-          ))}
-        </div>
-
-        {/* Sort & Search */}
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:w-48">
-            <input
-              type="text"
-              placeholder="Search in reviews..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-glass-border bg-glass-surface px-3 py-1.5 text-xs text-ink-900 placeholder:text-ink-500 focus:outline-none focus:border-brand-500"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-ink-500 hover:text-ink-900"
-              >
-                ✕
-              </button>
-            )}
+            ))}
           </div>
 
           <select
             value={sortBy}
             onChange={(e: any) => setSortBy(e.target.value)}
-            className="rounded-xl border border-glass-border bg-glass-surface px-3 py-1.5 text-xs text-ink-900 focus:outline-none focus:border-brand-500"
+            className="input"
+            style={{ width: "auto", padding: "8px 14px", fontSize: "0.875rem" }}
           >
             <option value="NEWEST">Most Recent</option>
             <option value="HIGHEST">Highest Rated</option>
@@ -439,221 +319,205 @@ export function ReviewsSection({
       </div>
 
       {/* Reviews List */}
-      <div className="mt-5 space-y-4">
+      <div style={{ marginTop: "32px" }}>
         {filteredReviews.length === 0 ? (
-          <div className="text-center py-10 text-ink-500 text-sm">
-            No reviews match the selected filter. Try clearing filters or search query.
-          </div>
+          <p style={{ color: "#F0C4BC", fontSize: "1rem", padding: "24px 0" }}>
+            No reviews match the selected filter.
+          </p>
         ) : (
           filteredReviews.map((r) => {
             const customerName = r.customer?.name || "Verified Rider";
-            const initial = customerName.charAt(0).toUpperCase();
-            const avatarGradient = getAvatarColor(customerName);
-            const isHelpful = !!helpfulClicked[r.id];
-
             return (
               <div
                 key={r.id}
-                className="rounded-2xl border border-glass-border bg-glass-surface p-5 transition-all hover:border-glass-border-strong hover:bg-glass-surface/80"
+                style={{
+                  padding: "24px 0",
+                  borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+                }}
               >
-                <div className="flex items-start justify-between gap-3">
-                  {/* Reviewer Profile */}
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr ${avatarGradient} text-sm font-bold text-white shadow-md`}
-                    >
-                      {initial}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: "1.25rem", color: "#FFFFFF", textTransform: "uppercase" }}>
+                        {customerName}
+                      </span>
+                      <span style={{ fontSize: "0.8125rem", color: "#F9D3CD", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                        ✓ Verified Rider
+                      </span>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-ink-900 text-sm">{customerName}</span>
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/30">
-                          ✓ Verified Rider
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-xs text-ink-500">
-                        <StarRating rating={r.rating} size="w-3.5 h-3.5" />
-                        <span>·</span>
-                        <span>{new Date(r.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}</span>
-                        {r.rentalDuration && (
-                          <>
-                            <span>·</span>
-                            <span>Rented for {r.rentalDuration}</span>
-                          </>
-                        )}
-                      </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px", fontSize: "0.875rem", color: "#F0C4BC" }}>
+                      <StarRating rating={r.rating} />
+                      <span>·</span>
+                      <span>{new Date(r.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}</span>
+                      {r.rentalDuration && (
+                        <>
+                          <span>·</span>
+                          <span>{r.rentalDuration}</span>
+                        </>
+                      )}
                     </div>
                   </div>
-
-                  {/* Rating Badge */}
-                  <div className="flex items-center gap-1 rounded-lg bg-amber-400/10 px-2.5 py-1 text-xs font-bold text-amber-400 border border-amber-400/20">
-                    <span>{r.rating}.0</span>
-                    <span>★</span>
-                  </div>
-                </div>
-
-                {/* Review Text */}
-                {r.comment && (
-                  <p className="mt-3 text-sm text-ink-700 leading-relaxed whitespace-pre-line">
-                    {r.comment}
-                  </p>
-                )}
-
-                {/* Tags & Helpful button */}
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-glass-border/50 text-xs">
-                  {r.tags && r.tags.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {r.tags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className="rounded-md bg-white/5 px-2 py-0.5 text-[11px] font-medium text-ink-600 border border-white/5"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : <div />}
 
                   <button
                     type="button"
                     onClick={() => handleHelpful(r.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-medium transition ${
-                      isHelpful
-                        ? "bg-brand-500/20 text-brand-300 border border-brand-500/30"
-                        : "text-ink-500 hover:text-ink-900 hover:bg-white/5"
-                    }`}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#F0C4BC",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
                   >
-                    <span>👍</span>
-                    <span>Helpful {r.helpfulCount ? `(${r.helpfulCount})` : ""}</span>
+                    Helpful {r.helpfulCount ? `(${r.helpfulCount})` : ""}
                   </button>
                 </div>
+
+                {r.comment && (
+                  <p style={{ fontSize: "1rem", color: "#F9D3CD", lineHeight: 1.65, marginTop: "12px" }}>
+                    {r.comment}
+                  </p>
+                )}
+
+                {r.tags && r.tags.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "12px" }}>
+                    {r.tags.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        style={{
+                          fontSize: "0.8125rem",
+                          color: "#F0C4BC",
+                          border: "1px solid rgba(249, 211, 205, 0.25)",
+                          padding: "3px 10px",
+                          textTransform: "uppercase",
+                          fontWeight: 600,
+                        }}
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })
         )}
       </div>
 
-      {/* Write Review Modal */}
+      {/* Review Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/60 animate-fade-in">
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(35, 2, 6, 0.85)",
+            padding: "16px",
+          }}
+          onClick={() => setIsModalOpen(false)}
+        >
           <div
-            className="card w-full max-w-lg p-6 relative border border-white/10 shadow-2xl"
+            style={{
+              backgroundColor: "#4E050E",
+              border: "1px solid #F9D3CD",
+              padding: "36px",
+              maxWidth: "500px",
+              width: "100%",
+              position: "relative",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close X */}
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-ink-500 hover:text-white p-1"
+              style={{ position: "absolute", top: "16px", right: "16px", background: "none", border: "none", cursor: "pointer", fontSize: "1.25rem", color: "#F9D3CD" }}
             >
               ✕
             </button>
 
-            <h3 className="font-display text-xl font-bold text-ink-900">
-              Share Your Ride Experience
+            <h3 style={{ fontFamily: "'Bebas Neue'", fontSize: "2rem", color: "#F9D3CD", margin: 0, textTransform: "uppercase" }}>
+              Share Your Experience
             </h3>
-            <p className="mt-1 text-xs text-ink-500">
-              Your feedback helps other local riders and builds trust in the community.
+            <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "4px" }}>
+              Help other Jaipur tourists pick the right machine.
             </p>
 
             {submitSuccess ? (
-              <div className="mt-6 text-center py-8 space-y-2">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 text-2xl border border-emerald-500/30">
-                  ✓
-                </div>
-                <h4 className="font-display text-lg font-bold text-white">Review Submitted!</h4>
-                <p className="text-xs text-ink-500">
-                  Thank you for contributing to the RideLocal community.
-                </p>
+              <div style={{ textAlign: "center", padding: "36px 0" }}>
+                <p style={{ fontFamily: "'Bebas Neue'", fontSize: "2.5rem", color: "#F9D3CD" }}>✓ Review Submitted</p>
               </div>
             ) : (
-              <form onSubmit={handleReviewSubmit} className="mt-5 space-y-4">
-                {/* Interactive Star Rating Selector */}
+              <form onSubmit={handleReviewSubmit} style={{ marginTop: "24px" }}>
                 <div>
-                  <label className="label">Overall Rating</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
+                  <label className="label">Rating</label>
+                  <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
+                    {[1, 2, 3, 4, 5].map((n) => (
                       <button
-                        key={star}
+                        key={n}
                         type="button"
-                        onMouseEnter={() => setModalHoverRating(star)}
-                        onMouseLeave={() => setModalHoverRating(null)}
-                        onClick={() => setModalRating(star)}
-                        className="p-1 transition-transform hover:scale-125 focus:outline-none"
+                        onClick={() => setModalRating(n)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          fontSize: "2rem",
+                          cursor: "pointer",
+                          color: n <= modalRating ? "#F9D3CD" : "rgba(249, 211, 205, 0.3)",
+                        }}
                       >
-                        <StarIcon
-                          filled={star <= currentDisplayRating}
-                          className="w-8 h-8 cursor-pointer"
-                        />
+                        ★
                       </button>
                     ))}
                   </div>
-                  <p className="mt-1 text-xs font-semibold text-brand-400">
-                    {RATING_LABELS[currentDisplayRating]}
-                  </p>
                 </div>
 
-                {/* Experience Highlights / Tags */}
-                <div>
-                  <label className="label">What stood out? (Optional)</label>
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
-                    {SAMPLE_TAGS.map((tag) => {
-                      const isSelected = modalSelectedTags.includes(tag);
-                      return (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => toggleTag(tag)}
-                          className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${
-                            isSelected
-                              ? "bg-brand-500 text-white shadow-sm"
-                              : "bg-glass-surface border border-glass-border text-ink-600 hover:text-ink-900"
-                          }`}
-                        >
-                          {isSelected ? "✓ " : "+ "}
-                          {tag}
-                        </button>
-                      );
-                    })}
+                <div style={{ marginTop: "16px" }}>
+                  <label className="label">Highlights</label>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "6px" }}>
+                    {SAMPLE_TAGS.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleTag(tag)}
+                        style={{
+                          padding: "6px 12px",
+                          fontSize: "0.8125rem",
+                          fontWeight: 600,
+                          border: modalSelectedTags.includes(tag) ? "1px solid #F9D3CD" : "1px solid rgba(249, 211, 205, 0.25)",
+                          backgroundColor: modalSelectedTags.includes(tag) ? "#F9D3CD" : "transparent",
+                          color: modalSelectedTags.includes(tag) ? "#680A16" : "#F0C4BC",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {tag}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                {/* Review Textarea */}
-                <div>
-                  <label className="label">Your Review & Comments</label>
+                <div style={{ marginTop: "16px" }}>
+                  <label className="label">Your Comments</label>
                   <textarea
                     rows={4}
                     required
-                    placeholder="Describe vehicle condition, pickup experience, engine performance, comfort, or owner communication..."
+                    placeholder="Describe vehicle condition, pickup experience, engine performance..."
                     value={modalComment}
                     onChange={(e) => setModalComment(e.target.value)}
-                    className="input w-full resize-none text-sm"
+                    className="input"
+                    style={{ width: "100%", marginTop: "4px" }}
                   />
-                  <div className="mt-1 flex justify-between text-[11px] text-ink-500">
-                    <span>Minimum 10 characters</span>
-                    <span>{modalComment.length} / 1000</span>
-                  </div>
                 </div>
 
-                {modalError && (
-                  <p className="text-xs text-red-400 bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">
-                    {modalError}
-                  </p>
-                )}
+                {modalError && <p style={{ fontSize: "0.875rem", color: "#FFAAAA", marginTop: "8px" }}>{modalError}</p>}
 
-                <div className="flex gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="btn-secondary flex-1 py-2.5"
-                  >
+                <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="btn-secondary" style={{ flex: 1, padding: "14px" }}>
                     Cancel
                   </button>
-                  <button
-                    type="submit"
-                    disabled={submitting || modalComment.trim().length < 5}
-                    className="btn-primary flex-1 py-2.5"
-                  >
+                  <button type="submit" disabled={submitting || modalComment.trim().length < 5} className="btn-primary" style={{ flex: 1, padding: "14px" }}>
                     {submitting ? "Posting..." : "Submit Review"}
                   </button>
                 </div>

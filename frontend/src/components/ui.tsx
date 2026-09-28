@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Loader } from "./Loader";
 
 // A handful of tiny, reusable building blocks referenced throughout the
 // app. Most visual identity actually lives in index.css (.card, .btn-*,
@@ -42,14 +43,7 @@ export function EmptyState({
 }
 
 export function LoadingState({ label = "Loading..." }: { label?: string }) {
-  return (
-    <div className="space-y-3">
-      <div className="skeleton h-24 rounded-2xl" />
-      <div className="skeleton h-24 rounded-2xl" />
-      <div className="skeleton h-24 rounded-2xl" />
-      <p className="sr-only">{label}</p>
-    </div>
-  );
+  return <Loader message={label} />;
 }
 
 export function ErrorState({ message }: { message: string }) {

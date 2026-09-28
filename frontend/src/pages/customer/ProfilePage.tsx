@@ -32,39 +32,99 @@ export function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-8">
-      <h1 className="font-display text-2xl font-bold text-ink-900">Your profile</h1>
+    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "56px 24px" }}>
+      <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+        ACCOUNT PROFILE
+      </p>
+      <h1
+        style={{
+          fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+          fontWeight: 800,
+          fontSize: "clamp(2.75rem, 6vw, 4.5rem)",
+          lineHeight: 0.9,
+          letterSpacing: "0.01em",
+          color: "#F9D3CD",
+          textTransform: "uppercase",
+          margin: "8px 0 0",
+        }}
+      >
+        YOUR DETAILS.
+      </h1>
 
-      <div className="card mt-5 p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <span className="text-sm text-ink-500">Verification status</span>
+      <div style={{ marginTop: "40px", borderTop: "1px solid rgba(249, 211, 205, 0.3)", paddingTop: "28px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px", backgroundColor: "#4E050E", padding: "16px 20px", border: "1px solid rgba(249, 211, 205, 0.2)" }}>
+          <div>
+            <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>
+              VERIFICATION STATUS
+            </p>
+            {user.verificationStatus !== "VERIFIED" && (
+              <Link
+                to="/verification"
+                style={{
+                  fontSize: "0.9375rem",
+                  fontWeight: 700,
+                  color: "#FFFFFF",
+                  textDecoration: "underline",
+                  marginTop: "4px",
+                  display: "inline-block",
+                }}
+              >
+                Upload driving licence →
+              </Link>
+            )}
+          </div>
           <StatusBadge status={user.verificationStatus} />
         </div>
-        {user.verificationStatus !== "VERIFIED" && (
-          <Link to="/verification" className="text-sm font-medium text-brand-600">
-            Complete identity verification →
-          </Link>
-        )}
 
-        <form className="mt-5 space-y-4" onSubmit={handleSave}>
+        <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
           <div>
-            <label className="label">Full name</label>
-            <input className="input" value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-          <div>
-            <label className="label">Email</label>
-            <input className="input bg-neutral-50" value={user.email} disabled />
-          </div>
-          <div>
-            <label className="label">Phone</label>
-            <input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <label className="label">Full Legal Name</label>
+            <input
+              className="input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          {saved && <p className="text-sm text-green-600">Profile updated.</p>}
+          <div>
+            <label className="label">Email Address (Locked)</label>
+            <input
+              className="input"
+              value={user.email}
+              disabled
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.4)", color: "#F0C4BC" }}
+            />
+          </div>
 
-          <button type="submit" className="btn-primary w-full">
-            Save changes
+          <div>
+            <label className="label">Phone Number</label>
+            <input
+              className="input"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+91 98765 43210"
+            />
+          </div>
+
+          {error && <p style={{ fontSize: "0.8125rem", color: "#FFAAAA", marginTop: "4px" }}>{error}</p>}
+          {saved && (
+            <p style={{ fontSize: "0.8125rem", color: "#FFFFFF", marginTop: "4px", backgroundColor: "rgba(249, 211, 205, 0.1)", padding: "10px", border: "1px solid #F9D3CD" }}>
+              ✓ Profile information saved successfully.
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="btn-primary"
+            style={{
+              width: "100%",
+              marginTop: "12px",
+              padding: "16px",
+              fontSize: "0.875rem",
+            }}
+          >
+            Save Profile Changes →
           </button>
         </form>
       </div>

@@ -1,31 +1,31 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: "#fff7ed",
-          100: "#ffedd5",
-          200: "#fed7aa",
-          300: "#fdba74",
-          400: "#fb923c",
-          500: "#f97316",
-          600: "#ea580c",
-          700: "#c2410c",
-          800: "#9a3412",
-          900: "#7c2d12",
+        crimson: {
+          950: "#360208",
+          900: "#4E050E",
+          850: "#5D0812",
+          800: "#680A16", // Primary background
+          750: "#740D1A",
+          700: "#821220",
+          600: "#9C1A2B",
         },
-        ink: {
-          900: "#111827",
-          700: "#374151",
-          500: "#6b7280",
+        blush: {
+          50: "#FFFFFF",
+          100: "#FDF1EF",
+          200: "#F9D3CD", // Primary text / highlight
+          300: "#F1B7AE",
+          400: "#DFA8A0", // Secondary text / muted
+          500: "#C9887F",
         },
       },
       fontFamily: {
-        display: ["'Sora'", "system-ui", "sans-serif"],
-        body: ["'Inter'", "system-ui", "sans-serif"],
+        headline: ["'Bebas Neue'", "'Barlow Condensed'", "system-ui", "sans-serif"],
+        display: ["'Barlow Condensed'", "'DM Sans'", "system-ui", "sans-serif"],
+        body: ["'DM Sans'", "system-ui", "sans-serif"],
       },
     },
   },

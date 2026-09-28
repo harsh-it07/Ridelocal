@@ -1,14 +1,14 @@
 import { FormEvent, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, getErrorMessage } from "../../api/client";
 import { UploadArea } from "../../components/UploadArea";
 import { resolvePhotoUrl } from "../../components/VehicleGallery";
 
 const TYPES = [
-  { id: "SCOOTER", label: "Scooter / Moped", icon: "🛵" },
-  { id: "MOTORCYCLE", label: "Motorcycle / Bike", icon: "🏍️" },
-  { id: "EBIKE", label: "Electric Bike / Scooter", icon: "⚡" },
-  { id: "BICYCLE", label: "Bicycle", icon: "🚲" },
+  { id: "SCOOTER", label: "Scooter / Moped" },
+  { id: "MOTORCYCLE", label: "Motorcycle / Bike" },
+  { id: "EBIKE", label: "Electric Two-Wheeler" },
+  { id: "BICYCLE", label: "Bicycle" },
 ];
 
 const DEMO_PHOTO_SETS: Record<string, string[]> = {
@@ -49,11 +49,18 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
   });
 
   const [photos, setPhotos] = useState<string[]>([]);
+  const [photoUrlInput, setPhotoUrlInput] = useState("");
   const [docQueue, setDocQueue] = useState<{ documentType: string; secureFileReference: string; fileName?: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [vehicleStatus, setVehicleStatus] = useState<string | null>(null);
   const [detectingLocation, setDetectingLocation] = useState(false);
+
+  function handleAddPhotoUrl() {
+    if (!photoUrlInput.trim()) return;
+    setPhotos((prev) => [...prev, photoUrlInput.trim()]);
+    setPhotoUrlInput("");
+  }
 
   useEffect(() => {
     if (mode === "edit" && id) {
@@ -128,7 +135,6 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
   async function handleSave(submitForApproval = false) {
     setError(null);
 
-    // Validation
     if (!form.brand.trim() || !form.model.trim() || !form.registrationReference.trim()) {
       setError("Please fill in Brand, Model, and Registration Number.");
       return;
@@ -175,7 +181,6 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
         await api.patch(`/vehicles/${id}`, payload);
       }
 
-      // Submit queued documents if any
       if (docQueue.length > 0 && vehicleId) {
         await api.post("/verification/submit", {
           verificationType: "VEHICLE_DOCUMENTS",
@@ -187,7 +192,6 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
         });
       }
 
-      // Submit for admin approval if requested
       if (submitForApproval && vehicleId) {
         await api.post(`/vehicles/${vehicleId}/submit`);
       }
@@ -203,65 +207,87 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
   const hasRcDoc = docQueue.some((d) => d.documentType === "VEHICLE_RC");
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-ink-900">
-            {mode === "create" ? "Register a new ride" : "Edit vehicle details"}
+    <div style={{ maxWidth: "880px", margin: "0 auto", padding: "56px 24px" }}>
+      {/* Header */}
+      <div>
+        <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+          OWNER FLEET MANAGEMENT
+        </p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "20px" }}>
+          <h1
+            style={{
+              fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+              fontSize: "clamp(3rem, 7vw, 5rem)",
+              lineHeight: 0.9,
+              letterSpacing: "0.01em",
+              color: "#F9D3CD",
+              textTransform: "uppercase",
+              margin: "6px 0 0",
+            }}
+          >
+            {mode === "create" ? "LIST A NEW RIDE." : "EDIT VEHICLE."}
           </h1>
-          <p className="mt-1 text-sm text-ink-500">
-            List your bike or car for verified local riders. Minimum 2 vehicle photos & RC verification required.
-          </p>
+          {mode === "edit" && vehicleStatus && (
+            <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#F9D3CD", textTransform: "uppercase", border: "1px solid #F9D3CD", padding: "4px 12px" }}>
+              {vehicleStatus}
+            </span>
+          )}
         </div>
-        {mode === "edit" && vehicleStatus && (
-          <span className="chip text-xs uppercase tracking-wider">{vehicleStatus}</span>
-        )}
+        <p style={{ fontSize: "1.0625rem", color: "#F0C4BC", marginTop: "10px", fontWeight: 500 }}>
+          List your two-wheeler for vetted travelers. 2+ photos & RC certificate required for admin verification.
+        </p>
       </div>
 
       <form
-        className="mt-6 space-y-6"
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           handleSave(false);
         }}
+        style={{ marginTop: "44px" }}
       >
-        {/* Step 1: Vehicle Specifications */}
-        <div className="card p-6 space-y-4">
-          <div className="flex items-center gap-2 border-b border-glass-border pb-3">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500/20 text-xs font-bold text-brand-400">
-              1
-            </span>
-            <h2 className="font-display font-semibold text-ink-900">Vehicle Specifications</h2>
+        {/* Section 01: Specifications */}
+        <div style={{ borderTop: "1px solid rgba(249, 211, 205, 0.35)", paddingTop: "28px" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "24px" }}>
+            <span style={{ fontFamily: "'Bebas Neue'", fontSize: "1.75rem", color: "#F9D3CD" }}>01</span>
+            <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "#FFFFFF", margin: 0 }}>
+              VEHICLE SPECIFICATIONS
+            </h2>
           </div>
 
-          {/* Vehicle Type Selection */}
-          <div>
+          {/* Vehicle Type */}
+          <div style={{ marginBottom: "20px" }}>
             <label className="label">Vehicle Type</label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-1">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "8px", marginTop: "6px" }}>
               {TYPES.map((t) => (
                 <button
                   key={t.id}
                   type="button"
                   onClick={() => set("vehicleType", t.id)}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl border text-sm transition-all ${
-                    form.vehicleType === t.id
-                      ? "border-brand-500 bg-brand-500/10 text-brand-300 font-semibold shadow-sm"
-                      : "border-glass-border bg-glass-surface hover:border-glass-border-strong text-ink-700"
-                  }`}
+                  style={{
+                    padding: "14px",
+                    fontSize: "0.875rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    border: form.vehicleType === t.id ? "1px solid #F9D3CD" : "1px solid rgba(249, 211, 205, 0.2)",
+                    backgroundColor: form.vehicleType === t.id ? "#F9D3CD" : "rgba(0, 0, 0, 0.2)",
+                    color: form.vehicleType === t.id ? "#680A16" : "#F0C4BC",
+                    cursor: "pointer",
+                    textAlign: "center",
+                  }}
                 >
-                  <span className="text-2xl mb-1">{t.icon}</span>
-                  <span>{t.label}</span>
+                  {t.label}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }} className="form-two-col">
             <div>
               <label className="label">Brand / Make</label>
               <input
                 className="input"
-                placeholder="e.g. Royal Enfield, Honda, Yamaha"
+                placeholder="e.g. Royal Enfield, Honda"
                 value={form.brand}
                 onChange={(e) => set("brand", e.target.value)}
                 required
@@ -279,19 +305,19 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "16px" }} className="form-three-col">
             <div>
-              <label className="label">Registration Number</label>
+              <label className="label">Registration No.</label>
               <input
-                className="input uppercase"
-                placeholder="e.g. RJ14 AB 1234"
+                className="input"
+                placeholder="RJ14 AB 1234"
                 value={form.registrationReference}
-                onChange={(e) => set("registrationReference", e.target.value)}
+                onChange={(e) => set("registrationReference", e.target.value.toUpperCase())}
                 required
               />
             </div>
             <div>
-              <label className="label">Price per day (₹)</label>
+              <label className="label">Daily Rate (₹)</label>
               <input
                 type="number"
                 min="50"
@@ -304,12 +330,12 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
               />
             </div>
             <div>
-              <label className="label">Security Deposit (₹)</label>
+              <label className="label">Deposit (₹)</label>
               <input
                 type="number"
                 min="0"
                 step="100"
-                placeholder="₹ Refundable deposit"
+                placeholder="₹ Refundable"
                 className="input"
                 value={form.securityDeposit}
                 onChange={(e) => set("securityDeposit", e.target.value)}
@@ -319,34 +345,39 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
           </div>
 
           {/* Location & GPS */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "16px", marginBottom: "16px" }} className="form-location-col">
             <div>
-              <label className="label">City / Region</label>
+              <label className="label">City Hub</label>
               <input
                 className="input"
-                placeholder="e.g. Jaipur"
+                placeholder="Jaipur"
                 value={form.city}
                 onChange={(e) => set("city", e.target.value)}
                 required
               />
             </div>
-            <div className="sm:col-span-2">
-              <div className="flex items-center justify-between">
-                <label className="label">Coordinates (Latitude, Longitude)</label>
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <label className="label" style={{ marginBottom: 0 }}>Coordinates (Lat, Lng)</label>
                 <button
                   type="button"
                   onClick={detectGPS}
                   disabled={detectingLocation}
-                  className="text-xs text-brand-400 hover:text-brand-300 font-medium inline-flex items-center gap-1 mb-1"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "0.8125rem",
+                    fontWeight: 700,
+                    color: "#FFFFFF",
+                    cursor: "pointer",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                  }}
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  {detectingLocation ? "Detecting GPS..." : "Auto-detect GPS"}
+                  {detectingLocation ? "Detecting..." : "Auto-detect GPS"}
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "6px" }}>
                 <input
                   className="input"
                   placeholder="Latitude"
@@ -365,44 +396,43 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
             </div>
           </div>
 
-          <div>
-            <label className="label">Ride Highlights & Description</label>
+          <div style={{ marginBottom: "16px" }}>
+            <label className="label">Vehicle Description</label>
             <textarea
               className="input"
               rows={3}
-              placeholder="Describe condition, mileage, helmet inclusion, recent service, or pickup instructions..."
+              placeholder="State condition, service history, helmets provided, pickup instructions..."
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
             />
           </div>
         </div>
 
-        {/* Step 2: Vehicle Photos (Minimum 2 Required) */}
-        <div className="card p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-glass-border pb-3">
-            <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500/20 text-xs font-bold text-brand-400">
-                2
-              </span>
-              <div>
-                <h2 className="font-display font-semibold text-ink-900">Vehicle Photos</h2>
-                <p className="text-xs text-ink-500">Minimum two high-resolution photos required.</p>
-              </div>
+        {/* Section 02: Photos */}
+        <div style={{ borderTop: "1px solid rgba(249, 211, 205, 0.35)", paddingTop: "28px", marginTop: "40px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "20px", flexWrap: "wrap", gap: "8px" }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
+              <span style={{ fontFamily: "'Bebas Neue'", fontSize: "1.75rem", color: "#F9D3CD" }}>02</span>
+              <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "#FFFFFF", margin: 0 }}>
+                VEHICLE PHOTOS
+              </h2>
             </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                  photos.length >= 2
-                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                    : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                }`}
-              >
-                {photos.length} / 2 photos uploaded
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <span style={{ fontSize: "0.875rem", color: photos.length >= 2 ? "#FFFFFF" : "#FFD285", fontWeight: 700 }}>
+                {photos.length} / 2 required
               </span>
               <button
                 type="button"
                 onClick={applyDemoPhotos}
-                className="text-xs text-brand-400 hover:text-brand-300 underline font-medium"
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "0.875rem",
+                  fontWeight: 700,
+                  color: "#F9D3CD",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                }}
               >
                 + Add sample photos
               </button>
@@ -411,81 +441,101 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
 
           <UploadArea
             category="bike-images"
-            label="Upload Bike / Vehicle Photo (Front, Side, or Rear Angle)"
+            label="Upload Vehicle Photos (Front, Side, or Rear Angle)"
             accept=".jpg,.jpeg,.png,.webp"
             onUploaded={(r) => handlePhotoUploaded(r.fileRef)}
           />
 
-          {/* Photo Gallery Grid */}
+          <div style={{ marginTop: "12px" }}>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input
+                type="url"
+                placeholder="Or paste an image URL (e.g. from Google or web link)"
+                className="input"
+                style={{ padding: "10px 14px", fontSize: "0.875rem" }}
+                value={photoUrlInput}
+                onChange={(e) => setPhotoUrlInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddPhotoUrl();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleAddPhotoUrl}
+                className="btn-secondary"
+                style={{ padding: "10px 18px", fontSize: "0.875rem", whiteSpace: "nowrap" }}
+              >
+                + Add URL
+              </button>
+            </div>
+          </div>
+
           {photos.length > 0 && (
-            <div className="mt-3">
-              <p className="text-xs font-medium text-ink-500 mb-2">
-                Click "Make Cover" to set the primary thumbnail image shown in search.
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {photos.map((photoUrl, idx) => (
-                  <div
-                    key={idx}
-                    className="group relative h-28 overflow-hidden rounded-xl border border-glass-border bg-neutral-900/40 shadow-sm"
-                  >
-                    <img src={photoUrl} alt={`Vehicle view ${idx + 1}`} className="h-full w-full object-cover" />
-                    {idx === 0 && (
-                      <span className="absolute top-1.5 left-1.5 rounded-md bg-brand-600/90 px-2 py-0.5 text-[10px] font-bold text-white shadow">
-                        Cover Photo
-                      </span>
-                    )}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
-                      {idx !== 0 && (
-                        <button
-                          type="button"
-                          onClick={() => makeCoverPhoto(idx)}
-                          className="rounded-lg bg-white/20 p-1.5 text-white hover:bg-white/40 text-xs font-semibold"
-                          title="Set as Cover"
-                        >
-                          Cover
-                        </button>
-                      )}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "12px", marginTop: "18px" }}>
+              {photos.map((photoUrl, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    position: "relative",
+                    height: "105px",
+                    overflow: "hidden",
+                    border: idx === 0 ? "2px solid #F9D3CD" : "1px solid rgba(249, 211, 205, 0.2)",
+                    backgroundColor: "#4E050E",
+                  }}
+                >
+                  <img src={photoUrl} alt={`Vehicle view ${idx + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  {idx === 0 && (
+                    <span style={{ position: "absolute", top: 4, left: 4, backgroundColor: "#F9D3CD", color: "#680A16", fontSize: "0.5625rem", fontWeight: 800, padding: "2px 5px", textTransform: "uppercase" }}>
+                      Cover
+                    </span>
+                  )}
+                  <div style={{ position: "absolute", bottom: 4, right: 4, display: "flex", gap: "4px" }}>
+                    {idx !== 0 && (
                       <button
                         type="button"
-                        onClick={() => removePhoto(idx)}
-                        className="rounded-lg bg-red-600/80 p-1.5 text-white hover:bg-red-600"
-                        title="Delete photo"
+                        onClick={() => makeCoverPhoto(idx)}
+                        style={{ backgroundColor: "rgba(78, 5, 14, 0.9)", color: "#F9D3CD", border: "1px solid rgba(249, 211, 205, 0.3)", fontSize: "0.625rem", padding: "2px 5px", cursor: "pointer", fontWeight: 700 }}
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                        Cover
                       </button>
-                    </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(idx)}
+                      style={{ backgroundColor: "#9B2C2C", color: "#FFFFFF", border: "none", fontSize: "0.625rem", padding: "2px 5px", cursor: "pointer" }}
+                    >
+                      ✕
+                    </button>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        {/* Step 3: Document Verification */}
-        <div className="card p-6 space-y-4">
-          <div className="flex items-center justify-between border-b border-glass-border pb-3">
-            <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500/20 text-xs font-bold text-brand-400">
-                3
-              </span>
-              <div>
-                <h2 className="font-display font-semibold text-ink-900">Document Verification</h2>
-                <p className="text-xs text-ink-500">Official RC certificate required for admin verification approval.</p>
-              </div>
+        {/* Section 03: Documents */}
+        <div style={{ borderTop: "1px solid rgba(249, 211, 205, 0.35)", paddingTop: "28px", marginTop: "40px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "20px", flexWrap: "wrap", gap: "8px" }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
+              <span style={{ fontFamily: "'Bebas Neue'", fontSize: "1.75rem", color: "#F9D3CD" }}>03</span>
+              <h2 style={{ fontSize: "0.9375rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "#FFFFFF", margin: 0 }}>
+                DOCUMENT VERIFICATION
+              </h2>
             </div>
             {hasRcDoc && (
-              <span className="flex items-center gap-1 rounded-full bg-green-500/20 px-2.5 py-0.5 text-xs font-semibold text-green-400 border border-green-500/30">
+              <span style={{ fontSize: "0.875rem", color: "#FFFFFF", fontWeight: 700 }}>
                 ✓ RC attached
               </span>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }} className="form-two-col">
             <UploadArea
               category="rc-certificates"
-              label="RC Certificate (Registration Card)"
+              label="RC Certificate (Required)"
               accept=".jpg,.jpeg,.png,.pdf"
               onUploaded={(r) =>
                 setDocQueue((q) => [
@@ -497,7 +547,7 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
 
             <UploadArea
               category="other-documents"
-              label="Vehicle Insurance / PUC (Optional)"
+              label="Insurance / PUC (Optional)"
               accept=".jpg,.jpeg,.png,.pdf"
               onUploaded={(r) =>
                 setDocQueue((q) => [
@@ -509,12 +559,12 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
           </div>
 
           {docQueue.length > 0 && (
-            <div className="rounded-xl bg-glass-surface p-3 border border-glass-border text-xs text-ink-700">
-              <span className="font-medium text-ink-900">Ready to submit for verification:</span>
-              <ul className="mt-1 list-disc list-inside space-y-0.5 text-ink-500">
+            <div style={{ marginTop: "16px", border: "1px solid rgba(249, 211, 205, 0.25)", backgroundColor: "#4E050E", padding: "16px 20px", fontSize: "0.875rem", color: "#F0C4BC" }}>
+              <p style={{ fontWeight: 700, color: "#FFFFFF", textTransform: "uppercase", margin: 0 }}>Documents queued for review:</p>
+              <ul style={{ marginTop: "6px", paddingLeft: "16px", margin: 0 }}>
                 {docQueue.map((doc, idx) => (
                   <li key={idx}>
-                    {doc.documentType === "VEHICLE_RC" ? "Registration Certificate (RC)" : "Vehicle Insurance / Document"}{" "}
+                    {doc.documentType === "VEHICLE_RC" ? "Registration Certificate (RC)" : "Vehicle Document"}{" "}
                     {doc.fileName ? `(${doc.fileName})` : ""}
                   </li>
                 ))}
@@ -524,20 +574,18 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
         </div>
 
         {error && (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3.5 text-sm text-red-400 flex items-center gap-2">
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{error}</span>
-          </div>
+          <p style={{ fontSize: "0.875rem", color: "#FFAAAA", marginTop: "24px" }}>
+            {error}
+          </p>
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+        <div style={{ display: "flex", gap: "14px", marginTop: "36px", borderTop: "1px solid rgba(249, 211, 205, 0.2)", paddingTop: "28px", flexWrap: "wrap" }}>
           <button
             type="submit"
             disabled={submitting}
-            className="btn-secondary flex-1 py-3"
+            className="btn-secondary"
+            style={{ flex: 1, padding: "16px", fontSize: "0.875rem" }}
           >
             {submitting ? "Saving..." : mode === "create" ? "Save as Draft" : "Save Changes"}
           </button>
@@ -545,13 +593,44 @@ export function VehicleFormPage({ mode }: { mode: "create" | "edit" }) {
             type="button"
             onClick={() => handleSave(true)}
             disabled={submitting || photos.length < 2}
-            className={`btn-primary flex-1 py-3 ${photos.length < 2 ? "opacity-60 cursor-not-allowed" : ""}`}
-            title={photos.length < 2 ? "Upload at least 2 photos to submit for approval" : ""}
+            className="btn-primary"
+            style={{
+              flex: 1,
+              padding: "16px",
+              fontSize: "0.875rem",
+              opacity: photos.length < 2 ? 0.4 : 1,
+            }}
           >
-            {submitting ? "Processing..." : "Submit for Verification & Approval"}
+            {submitting ? "Processing..." : "Submit for Approval →"}
           </button>
         </div>
       </form>
+
+      <div style={{ marginTop: "36px" }}>
+        <Link
+          to="/owner"
+          style={{
+            fontSize: "0.8125rem",
+            fontWeight: 700,
+            color: "#FFFFFF",
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            borderBottom: "1px solid #FFFFFF",
+            paddingBottom: "2px",
+            textDecoration: "none",
+          }}
+        >
+          ← Return to Dashboard
+        </Link>
+      </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .form-two-col, .form-three-col, .form-location-col {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

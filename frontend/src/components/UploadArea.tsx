@@ -5,7 +5,8 @@ export type UploadCategory =
   | "driving-licences"
   | "rc-certificates"
   | "bike-images"
-  | "other-documents";
+  | "other-documents"
+  | "identity-documents";
 
 interface UploadResult {
   fileRef: string;
@@ -13,9 +14,6 @@ interface UploadResult {
   fileType: string;
 }
 
-// Real upload — POSTs to /api/uploads/:category, tracks progress, and
-// reports back the resulting fileRef once the file actually lands on the
-// server. Nothing here fakes success client-side.
 export function UploadArea({
   category,
   label,
@@ -68,7 +66,22 @@ export function UploadArea({
           const file = e.dataTransfer.files?.[0];
           if (file) handleFile(file);
         }}
-        className="cursor-pointer rounded-xl border-2 border-dashed border-neutral-300 bg-white/60 p-4 text-center transition-colors hover:border-brand-400 hover:bg-brand-50/40"
+        style={{
+          cursor: "pointer",
+          border: "1px dashed rgba(249, 211, 205, 0.35)",
+          padding: "24px",
+          textAlign: "center",
+          transition: "border-color 150ms ease, background-color 150ms ease",
+          backgroundColor: "rgba(0, 0, 0, 0.2)",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = "#F9D3CD";
+          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = "rgba(249, 211, 205, 0.35)";
+          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.2)";
+        }}
       >
         <input
           ref={inputRef}
@@ -82,29 +95,33 @@ export function UploadArea({
         />
 
         {status === "idle" && (
-          <p className="text-sm text-ink-500">
-            <span className="font-medium text-brand-600">Click to upload</span> or drag a file here
+          <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", margin: 0 }}>
+            <span style={{ fontWeight: 700, color: "#F9D3CD" }}>Click to select file</span> or drag & drop here
             <br />
-            <span className="text-xs">JPG, PNG, or PDF</span>
+            <span style={{ fontSize: "0.8125rem", color: "rgba(249, 211, 205, 0.75)", marginTop: "4px", display: "inline-block" }}>JPG, PNG, WEBP, or PDF</span>
           </p>
         )}
 
         {status !== "idle" && (
-          <div className="text-left">
-            <div className="flex items-center justify-between text-sm">
-              <span className="truncate font-medium text-ink-900">{fileName}</span>
-              {status === "done" && <span className="text-green-600">✓ Uploaded</span>}
-              {status === "error" && <span className="text-red-600">✕ Failed</span>}
+          <div style={{ textAlign: "left" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.9375rem" }}>
+              <span style={{ fontWeight: 700, color: "#FFFFFF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {fileName}
+              </span>
+              {status === "done" && <span style={{ color: "#F9D3CD", fontWeight: 700 }}>✓ Uploaded</span>}
+              {status === "error" && <span style={{ color: "#FFAAAA", fontWeight: 700 }}>✕ Upload Failed</span>}
             </div>
             {status === "uploading" && (
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
-                <div
-                  className="h-full bg-brand-500 transition-all"
-                  style={{ width: `${progress}%` }}
-                />
+              <div style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px" }}>
+                <div className="loader loader-sm" style={{ flexShrink: 0 }} />
+                <div style={{ flex: 1, height: "4px", overflow: "hidden", backgroundColor: "rgba(0, 0, 0, 0.4)" }}>
+                  <div
+                    style={{ height: "100%", backgroundColor: "#F9D3CD", transition: "width 200ms ease", width: `${progress}%` }}
+                  />
+                </div>
               </div>
             )}
-            {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+            {error && <p style={{ marginTop: "8px", fontSize: "0.8125rem", color: "#FFAAAA", margin: 0 }}>{error}</p>}
           </div>
         )}
       </div>

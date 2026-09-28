@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api, getErrorMessage } from "../../api/client";
 import { StatusBadge } from "../../components/StatusBadge";
 
@@ -14,28 +15,90 @@ export function OwnerBookingsPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="font-display text-2xl font-bold text-ink-900">Bookings for your vehicles</h1>
-      {error && <p className="mt-4 text-red-600">{error}</p>}
-      <div className="mt-5 space-y-3">
+    <div style={{ maxWidth: "880px", margin: "0 auto", padding: "56px 24px" }}>
+      <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+        OWNER FLEET PORTAL
+      </p>
+      <h1
+        style={{
+          fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+          fontSize: "clamp(3rem, 7vw, 5rem)",
+          lineHeight: 0.9,
+          letterSpacing: "0.01em",
+          color: "#F9D3CD",
+          textTransform: "uppercase",
+          margin: "8px 0 0",
+        }}
+      >
+        RENTAL BOOKINGS.
+      </h1>
+
+      {error && <p style={{ marginTop: "24px", color: "#FFAAAA" }}>{error}</p>}
+
+      <div style={{ marginTop: "40px", borderTop: "1px solid rgba(249, 211, 205, 0.3)" }}>
         {bookings.map((b) => (
-          <div key={b.id} className="card flex items-center justify-between p-4">
+          <div
+            key={b.id}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "24px 0",
+              borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+              gap: "20px",
+              flexWrap: "wrap",
+            }}
+          >
             <div>
-              <p className="font-semibold text-ink-900">
+              <p
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "1.5rem",
+                  color: "#FFFFFF",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
                 {b.vehicle?.brand} {b.vehicle?.model}
               </p>
-              <p className="text-sm text-ink-500">
-                Customer: {b.customer?.name} · {new Date(b.startTime).toLocaleDateString()} →{" "}
-                {new Date(b.endTime).toLocaleDateString()}
+              <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "6px", fontWeight: 500 }}>
+                Rider: {b.customer?.name} · {new Date(b.startTime).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} →{" "}
+                {new Date(b.endTime).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="font-semibold text-ink-900">₹{b.totalAmount}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+              <span style={{ fontFamily: "'Bebas Neue'", fontSize: "1.75rem", color: "#F9D3CD" }}>
+                ₹{b.totalAmount}
+              </span>
               <StatusBadge status={b.status} />
             </div>
           </div>
         ))}
-        {bookings.length === 0 && <p className="text-ink-500">No bookings yet.</p>}
+
+        {bookings.length === 0 && (
+          <p style={{ color: "#F0C4BC", fontSize: "1rem", padding: "40px 0" }}>
+            No bookings recorded for your vehicles yet.
+          </p>
+        )}
+      </div>
+
+      <div style={{ marginTop: "40px" }}>
+        <Link
+          to="/owner"
+          style={{
+            fontSize: "0.875rem",
+            fontWeight: 700,
+            color: "#FFFFFF",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            borderBottom: "1px solid #FFFFFF",
+            paddingBottom: "2px",
+            textDecoration: "none",
+          }}
+        >
+          ← Return to Dashboard
+        </Link>
       </div>
     </div>
   );
@@ -54,29 +117,107 @@ export function OwnerEarningsPage() {
   const totalEarnings = earningBookings.reduce((sum, b) => sum + Number(b.rentalAmount), 0);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="font-display text-2xl font-bold text-ink-900">Earnings</h1>
+    <div style={{ maxWidth: "880px", margin: "0 auto", padding: "56px 24px" }}>
+      <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+        OWNER FINANCIALS
+      </p>
+      <h1
+        style={{
+          fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+          fontSize: "clamp(3rem, 7vw, 5rem)",
+          lineHeight: 0.9,
+          letterSpacing: "0.01em",
+          color: "#F9D3CD",
+          textTransform: "uppercase",
+          margin: "8px 0 0",
+        }}
+      >
+        EARNINGS SUMMARY.
+      </h1>
 
-      <div className="card mt-5 p-6">
-        <p className="text-sm text-ink-500">Total earnings from confirmed rentals</p>
-        <p className="mt-1 font-display text-3xl font-extrabold text-brand-600">
+      {/* Editorial metric block in deep wine container */}
+      <div
+        style={{
+          marginTop: "40px",
+          border: "1px solid rgba(249, 211, 205, 0.3)",
+          backgroundColor: "#4E050E",
+          padding: "36px",
+        }}
+      >
+        <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.14em" }}>
+          NET PAYOUT FROM CONFIRMED RENTALS
+        </p>
+        <p
+          style={{
+            fontFamily: "'Bebas Neue', sans-serif",
+            fontSize: "clamp(3.5rem, 8vw, 5.5rem)",
+            color: "#F9D3CD",
+            lineHeight: 0.95,
+            letterSpacing: "0.01em",
+            margin: "8px 0 0",
+          }}
+        >
           ₹{totalEarnings.toFixed(2)}
         </p>
-        <p className="mt-1 text-xs text-ink-500">
-          Across {earningBookings.length} rental{earningBookings.length === 1 ? "" : "s"} (excludes
-          platform fee and deposits)
+        <p style={{ fontSize: "0.9375rem", color: "#FFFFFF", marginTop: "12px", fontWeight: 500 }}>
+          Across {earningBookings.length} completed rental{earningBookings.length === 1 ? "" : "s"} (excludes security deposit & platform fee).
         </p>
       </div>
 
-      <div className="mt-5 space-y-2">
+      {/* Ledger list */}
+      <div style={{ marginTop: "40px" }}>
+        <h3 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#FFFFFF", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "20px" }}>
+          TRANSACTION HISTORY
+        </h3>
+
         {earningBookings.map((b) => (
-          <div key={b.id} className="card flex justify-between p-3 text-sm">
-            <span>
-              {b.vehicle?.brand} {b.vehicle?.model} — {new Date(b.startTime).toLocaleDateString()}
+          <div
+            key={b.id}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "20px 0",
+              borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+            }}
+          >
+            <div>
+              <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: "1.375rem", color: "#FFFFFF", textTransform: "uppercase", margin: 0 }}>
+                {b.vehicle?.brand} {b.vehicle?.model}
+              </p>
+              <p style={{ fontSize: "0.875rem", color: "#F0C4BC", marginTop: "4px" }}>
+                {new Date(b.startTime).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+              </p>
+            </div>
+            <span style={{ fontFamily: "'Bebas Neue'", fontWeight: 700, color: "#F9D3CD", fontSize: "1.75rem" }}>
+              +₹{b.rentalAmount}
             </span>
-            <span className="font-semibold text-ink-900">₹{b.rentalAmount}</span>
           </div>
         ))}
+
+        {earningBookings.length === 0 && (
+          <p style={{ color: "#F0C4BC", fontSize: "1rem", padding: "24px 0" }}>
+            No rental earnings recorded yet.
+          </p>
+        )}
+      </div>
+
+      <div style={{ marginTop: "40px" }}>
+        <Link
+          to="/owner"
+          style={{
+            fontSize: "0.875rem",
+            fontWeight: 700,
+            color: "#FFFFFF",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            borderBottom: "1px solid #FFFFFF",
+            paddingBottom: "2px",
+            textDecoration: "none",
+          }}
+        >
+          ← Return to Dashboard
+        </Link>
       </div>
     </div>
   );

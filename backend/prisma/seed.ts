@@ -81,7 +81,10 @@ async function main() {
       latitude: 26.9124,
       longitude: 75.7873,
       description: "Well-maintained scooter, great for city rides near Hawa Mahal.",
-      photoUrls: [],
+      photoUrls: [
+        "https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1525160354320-d8e92641c563?auto=format&fit=crop&w=1200&q=80"
+      ],
       ratingAvg: 4.6,
       ratingCount: 18,
       status: "ACTIVE" as const,
@@ -99,7 +102,10 @@ async function main() {
       latitude: 26.9239,
       longitude: 75.8267,
       description: "Perfect for a highway trip to Amber Fort.",
-      photoUrls: [],
+      photoUrls: [
+        "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=80"
+      ],
       ratingAvg: 4.8,
       ratingCount: 32,
       status: "ACTIVE" as const,
@@ -117,7 +123,10 @@ async function main() {
       latitude: 26.8890,
       longitude: 75.8060,
       description: "Electric scooter, silent and eco-friendly for short city hops.",
-      photoUrls: [],
+      photoUrls: [
+        "https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=1200&q=80"
+      ],
       ratingAvg: 4.3,
       ratingCount: 9,
       status: "ACTIVE" as const,
@@ -180,7 +189,10 @@ async function main() {
       where: { registrationReference: b.registrationReference },
     });
     const record = existing
-      ? existing
+      ? await prisma.vehicle.update({
+          where: { id: existing.id },
+          data: { photoUrls: b.photoUrls },
+        })
       : await prisma.vehicle.create({ data: b });
     bikes[b.registrationReference] = record.id;
   }

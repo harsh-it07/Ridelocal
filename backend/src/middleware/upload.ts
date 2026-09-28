@@ -8,7 +8,7 @@ import { AppError } from "../utils/errors";
 // Files land in uploads/<category>/<random>-<ext>, never under a
 // publicly served static folder. Access is controlled by
 // uploads.controller.ts, not by the filesystem being reachable directly.
-const CATEGORIES = ["driving-licences", "rc-certificates", "bike-images", "other-documents"] as const;
+const CATEGORIES = ["driving-licences", "rc-certificates", "bike-images", "other-documents", "identity-documents"] as const;
 export type UploadCategory = (typeof CATEGORIES)[number];
 
 const ALLOWED_MIME = new Set(["image/jpeg", "image/jpg", "image/png", "application/pdf"]);

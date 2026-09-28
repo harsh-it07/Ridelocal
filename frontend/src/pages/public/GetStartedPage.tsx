@@ -3,28 +3,23 @@ import { Link, useSearchParams } from "react-router-dom";
 const OPTIONS = [
   {
     role: "CUSTOMER" as const,
-    icon: "RL",
-    title: "Rent a Bike",
-    description:
-      "Find verified local bikes and explore your destination at your own pace.",
-    cta: "Continue as a tourist",
+    title: "RENT A BIKE",
+    description: "Browse verified local motorcycles, scooters & e-bikes. Explore Jaipur at your own speed with transparent daily rates.",
+    cta: "Continue as tourist →",
     to: "/register?role=CUSTOMER",
   },
   {
     role: "OWNER" as const,
-    icon: "OW",
-    title: "List Your Bike",
-    description:
-      "Turn your bike into an earning opportunity by renting it to verified travelers.",
-    cta: "Continue as an owner",
+    title: "LIST YOUR BIKE",
+    description: "Turn your idle two-wheeler into steady income. We verify tourist identities and manage escrow payments for your peace of mind.",
+    cta: "Continue as owner →",
     to: "/register?role=OWNER",
   },
   {
     role: "ADMIN" as const,
-    icon: "AD",
-    title: "Admin Access",
-    description: "Secure platform management and operations.",
-    cta: "Admin sign in",
+    title: "ADMIN ACCESS",
+    description: "Secure moderation portal for verification queues, vehicle approvals, and transaction audit logs.",
+    cta: "Admin sign in →",
     to: "/login?admin=1",
   },
 ];
@@ -34,60 +29,78 @@ export function GetStartedPage() {
   const highlight = params.get("role");
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-      <div className="mx-auto max-w-xl text-center animate-fade-up">
-        <span className="chip">Welcome to RideLocal</span>
-        <h1 className="mt-5 font-display text-3xl font-extrabold sm:text-4xl text-ink-900">
-          How would you like to get started?
-        </h1>
-        <p className="mt-3 text-ink-500">
-          Choose the path that fits you — each one leads to a tailored setup.
-        </p>
-      </div>
+    <div style={{ maxWidth: "880px", margin: "0 auto", padding: "64px 24px" }}>
+      <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+        ONBOARDING
+      </p>
+      <h1
+        style={{
+          fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+          fontSize: "clamp(3rem, 7vw, 5rem)",
+          lineHeight: 0.9,
+          letterSpacing: "0.01em",
+          color: "#F9D3CD",
+          textTransform: "uppercase",
+          margin: "8px 0 0",
+        }}
+      >
+        SELECT YOUR PATH.
+      </h1>
+      <p style={{ fontSize: "1.0625rem", color: "#F0C4BC", marginTop: "12px" }}>
+        Choose how you would like to participate in RideLocal.
+      </p>
 
-      <div className="mt-10 grid gap-5 sm:grid-cols-3">
+      <div style={{ marginTop: "48px" }}>
         {OPTIONS.map((opt, i) => (
           <div
             key={opt.role}
-            className={`card card-hover flex flex-col p-7 animate-fade-up stagger-${i + 1} ${
-              highlight === opt.role
-                ? "ring-2"
-                : ""
-            }`}
-            style={highlight === opt.role ? { boxShadow: '0 0 0 2px rgba(249, 115, 22,0.40)', borderColor: 'rgba(249, 115, 22,0.30)' } : {}}
+            style={{
+              padding: "36px 0",
+              borderTop: i === 0 ? "1px solid rgba(249, 211, 205, 0.4)" : "1px solid rgba(249, 211, 205, 0.2)",
+              borderBottom: i === OPTIONS.length - 1 ? "1px solid rgba(249, 211, 205, 0.2)" : "none",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              gap: "24px",
+              flexWrap: "wrap",
+            }}
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold tracking-wide"
-              style={{ background: 'rgba(249, 115, 22,0.12)', color: '#fb923c' }}
-            >
-              {opt.icon}
+            <div style={{ flex: 1, minWidth: "240px" }}>
+              <h2
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: "2rem",
+                  color: "#FFFFFF",
+                  letterSpacing: "0.02em",
+                  margin: 0,
+                }}
+              >
+                {opt.title}
+              </h2>
+              <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "8px", maxWidth: "28rem", lineHeight: 1.6 }}>
+                {opt.description}
+              </p>
             </div>
-            <h2 className="mt-5 font-display font-bold text-ink-900">{opt.title}</h2>
-            <p className="mt-2 flex-1 text-sm text-ink-500">
-              {opt.description}
-            </p>
-
-            {opt.role === "ADMIN" ? (
-              <>
-                <Link to={opt.to} className="btn-secondary mt-6 w-full">
-                  {opt.cta}
-                </Link>
-                <p className="mt-2 text-center text-xs text-ink-500">
-                  Admin accounts are provisioned by the platform team, not created here.
-                </p>
-              </>
-            ) : (
-              <Link to={opt.to} className="btn-glass mt-6 w-full">
-                {opt.cta}
-              </Link>
-            )}
+            <Link
+              to={opt.to}
+              className={highlight === opt.role ? "btn-primary" : "btn-secondary"}
+              style={{
+                alignSelf: "center",
+                whiteSpace: "nowrap",
+                padding: "12px 24px",
+                fontSize: "0.875rem",
+              }}
+            >
+              {opt.cta}
+            </Link>
           </div>
         ))}
       </div>
 
-      <p className="mt-9 text-center text-sm text-ink-500">
+      <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "40px" }}>
         Already have an account?{" "}
-        <Link to="/login" className="font-medium text-brand-600">
-          Log in
+        <Link to="/login" style={{ fontWeight: 700, color: "#FFFFFF", borderBottom: "1px solid #FFFFFF", paddingBottom: "1px", textDecoration: "none" }}>
+          Sign In →
         </Link>
       </p>
     </div>

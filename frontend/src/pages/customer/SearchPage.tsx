@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, getErrorMessage } from "../../api/client";
 import { VehicleCard } from "../../components/VehicleCard";
+import { Loader } from "../../components/Loader";
 import { RankedVehicle, VehicleType } from "../../types";
 
 const VEHICLE_TYPES: { value: VehicleType | ""; label: string }[] = [
@@ -65,66 +66,108 @@ export function SearchPage() {
   }, [coords, sortBy]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-display text-2xl font-bold text-ink-900">Find a nearby ride</h1>
-      <p className="mt-1 text-sm text-ink-500">
-        Share your location for the best matches, or search by city.
-      </p>
-
-      <div className="card mt-5 grid gap-3 p-4 sm:grid-cols-5">
-        <button onClick={detectLocation} className="btn-secondary sm:col-span-1">
-          Use my location
-        </button>
-        <input
-          className="input sm:col-span-1"
-          placeholder="City"
-          value={city}
-          disabled={!!coords}
-          onChange={(e) => setCity(e.target.value)}
-        />
-        <select
-          className="input sm:col-span-1"
-          value={vehicleType}
-          onChange={(e) => setVehicleType(e.target.value as VehicleType | "")}
+    <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "56px 24px" }}>
+      {/* Editorial Header */}
+      <div>
+        <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+          JAIPUR FLEET CATALOGUE
+        </p>
+        <h1
+          style={{
+            fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+            fontSize: "clamp(3.5rem, 8vw, 6rem)",
+            lineHeight: 0.9,
+            letterSpacing: "0.01em",
+            color: "#F9D3CD",
+            textTransform: "uppercase",
+            margin: "8px 0 0",
+          }}
         >
-          {VEHICLE_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>
-              {t.label}
-            </option>
-          ))}
-        </select>
-        <input
-          className="input sm:col-span-1"
-          placeholder="Max price/day"
-          type="number"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
-        />
-        <select
-          className="input sm:col-span-1"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as any)}
-        >
-          <option value="match">Best match</option>
-          <option value="distance">Nearest</option>
-          <option value="price">Cheapest</option>
-          <option value="rating">Top rated</option>
-        </select>
+          FIND YOUR RIDE.
+        </h1>
+        <p style={{ fontSize: "1.0625rem", color: "#F0C4BC", marginTop: "12px", fontWeight: 500 }}>
+          Two wheels. One city. Direct peer-to-peer verified bookings.
+        </p>
       </div>
 
-      {locationError && <p className="mt-2 text-sm text-amber-600">{locationError}</p>}
-
-      <div className="mt-3">
-        <button onClick={runSearch} className="btn-primary !py-2 !px-4 text-sm">
-          Search
-        </button>
+      {/* Filter Toolbar — Styled in Dark Wine / Crimson Panel */}
+      <div
+        style={{
+          marginTop: "40px",
+          border: "1px solid rgba(249, 211, 205, 0.25)",
+          backgroundColor: "#4E050E",
+          padding: "24px",
+        }}
+      >
+        <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "flex-end" }}>
+          <div style={{ flex: "1", minWidth: "130px" }}>
+            <label className="label">City Hub</label>
+            <input
+              className="input"
+              placeholder="City"
+              value={city}
+              disabled={!!coords}
+              onChange={(e) => setCity(e.target.value)}
+            />
+          </div>
+          <div style={{ flex: "1", minWidth: "130px" }}>
+            <label className="label">Vehicle Type</label>
+            <select
+              className="input"
+              value={vehicleType}
+              onChange={(e) => setVehicleType(e.target.value as VehicleType | "")}
+            >
+              {VEHICLE_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ flex: "1", minWidth: "120px" }}>
+            <label className="label">Max Price / Day</label>
+            <input
+              className="input"
+              placeholder="₹ Amount"
+              type="number"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+            />
+          </div>
+          <div style={{ flex: "1", minWidth: "130px" }}>
+            <label className="label">Sort Order</label>
+            <select
+              className="input"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+            >
+              <option value="match">Best match</option>
+              <option value="distance">Nearest</option>
+              <option value="price">Lowest price</option>
+              <option value="rating">Top rated</option>
+            </select>
+          </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button onClick={runSearch} className="btn-primary" style={{ padding: "14px 28px" }}>
+              Filter Fleet →
+            </button>
+            <button onClick={detectLocation} className="btn-secondary" style={{ padding: "14px 18px", fontSize: "0.875rem" }}>
+              Use GPS
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-6 space-y-3">
-        {loading && <p className="text-ink-500">Searching nearby vehicles...</p>}
-        {error && <p className="text-red-600">{error}</p>}
+      {locationError && <p style={{ marginTop: "12px", fontSize: "0.9375rem", color: "#F9D3CD" }}>{locationError}</p>}
+
+      {/* Results List */}
+      <div style={{ marginTop: "48px" }}>
+        {loading && <Loader message="Searching nearby verified fleet..." />}
+        {error && <p style={{ color: "#FF9B9B", fontSize: "1.0625rem" }}>{error}</p>}
         {!loading && results.length === 0 && !error && (
-          <p className="text-ink-500">No vehicles matched your search. Try widening filters.</p>
+          <div style={{ padding: "48px 0", textAlign: "left" }}>
+            <p style={{ color: "#F0C4BC", fontSize: "1.125rem" }}>
+              No vehicles matched your search filters. Try widening the price or selecting all vehicle types.
+            </p>
+          </div>
         )}
         {results.map((v) => (
           <VehicleCard key={v.id} vehicle={v} />

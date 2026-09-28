@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Role } from "../types";
+import { Loader } from "../components/Loader";
 
 export function ProtectedRoute({
   children,
@@ -13,7 +14,9 @@ export function ProtectedRoute({
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-ink-500">Loading...</div>
+      <div style={{ minHeight: "100vh", backgroundColor: "#680A16", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Loader message="Authenticating session..." size="lg" />
+      </div>
     );
   }
   if (!user) return <Navigate to="/login" replace />;

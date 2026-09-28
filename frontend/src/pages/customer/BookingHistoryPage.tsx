@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, getErrorMessage } from "../../api/client";
 import { StatusBadge } from "../../components/StatusBadge";
+import { Loader } from "../../components/Loader";
 import { Booking } from "../../types";
 
 export function BookingHistoryPage() {
@@ -18,31 +19,83 @@ export function BookingHistoryPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="font-display text-2xl font-bold text-ink-900">My bookings</h1>
+    <div style={{ maxWidth: "880px", margin: "0 auto", padding: "56px 24px" }}>
+      <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+        TRIP ACTIVITY
+      </p>
+      <h1
+        style={{
+          fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+          fontSize: "clamp(3rem, 7vw, 5rem)",
+          lineHeight: 0.9,
+          letterSpacing: "0.01em",
+          color: "#F9D3CD",
+          textTransform: "uppercase",
+          margin: "8px 0 0",
+        }}
+      >
+        MY RIDES.
+      </h1>
 
-      {loading && <p className="mt-4 text-ink-500">Loading...</p>}
-      {error && <p className="mt-4 text-red-600">{error}</p>}
+      {loading && <Loader message="Loading your ride ledger..." />}
+      {error && <p style={{ marginTop: "24px", color: "#FFAAAA", fontSize: "1.0625rem" }}>{error}</p>}
       {!loading && bookings.length === 0 && (
-        <p className="mt-4 text-ink-500">
-          You haven't booked a ride yet. <Link to="/search" className="text-brand-600 font-medium">Find one nearby</Link>.
-        </p>
+        <div style={{ padding: "48px 0", textAlign: "left" }}>
+          <p style={{ color: "#F0C4BC", fontSize: "1.125rem" }}>
+            You haven't reserved a ride yet.
+          </p>
+          <Link
+            to="/search"
+            className="btn-primary"
+            style={{ marginTop: "16px", display: "inline-block" }}
+          >
+            Find a Ride Nearby →
+          </Link>
+        </div>
       )}
 
-      <div className="mt-5 space-y-3">
+      <div style={{ marginTop: "40px", borderTop: "1px solid rgba(249, 211, 205, 0.3)" }}>
         {bookings.map((b) => (
-          <Link key={b.id} to={`/bookings/${b.id}`} className="card flex items-center justify-between p-4">
+          <Link
+            key={b.id}
+            to={`/bookings/${b.id}`}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "24px 0",
+              borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+              textDecoration: "none",
+              color: "inherit",
+              gap: "20px",
+              flexWrap: "wrap",
+            }}
+          >
             <div>
-              <p className="font-semibold text-ink-900">
+              <p
+                style={{
+                  fontFamily: "'Barlow Condensed', 'Bebas Neue', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "1.625rem",
+                  color: "#FFFFFF",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
                 {b.vehicle?.brand} {b.vehicle?.model}
               </p>
-              <p className="text-sm text-ink-500">
-                {new Date(b.startTime).toLocaleDateString()} → {new Date(b.endTime).toLocaleDateString()}
+              <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "6px", fontWeight: 500 }}>
+                {new Date(b.startTime).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} — {new Date(b.endTime).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="font-semibold text-ink-900">₹{b.totalAmount}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+              <span style={{ fontFamily: "'Bebas Neue'", fontSize: "2rem", color: "#F9D3CD" }}>
+                ₹{b.totalAmount}
+              </span>
               <StatusBadge status={b.status} />
+              <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "#FFFFFF", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Details →
+              </span>
             </div>
           </Link>
         ))}

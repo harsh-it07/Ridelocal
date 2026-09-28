@@ -4,8 +4,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { Navbar } from "./components/Navbar";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
-import CrosshairCursor from "./components/CrosshairCursor";
-
 import { LandingPage } from "./pages/public/LandingPage";
 import { LoginPage } from "./pages/public/LoginPage";
 import { RegisterPage } from "./pages/public/RegisterPage";
@@ -33,6 +31,7 @@ import {
   PaymentMonitoringPage,
   DisputesPage,
 } from "./pages/admin/AdminMonitoringPages";
+import { AdminProgramInfoPage } from "./pages/admin/AdminProgramInfoPage";
 
 const queryClient = new QueryClient();
 
@@ -42,8 +41,7 @@ export default function App() {
       <ThemeProvider>
         <BrowserRouter>
           <AuthProvider>
-            <div className="flex min-h-screen flex-col">
-              <CrosshairCursor />
+            <div className="flex min-h-screen flex-col" style={{ backgroundColor: '#680A16', color: '#F9D3CD' }}>
               <Navbar />
               <main className="flex-1">
               <Routes>

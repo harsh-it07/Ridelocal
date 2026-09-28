@@ -1,68 +1,63 @@
-// Glass-styled status badges for the warm dark gradient background.
-// Each status maps to a translucent glass color pairing.
-const COLORS: Record<string, string> = {
-  VERIFIED: "glass-badge-green",
-  ACTIVE: "glass-badge-green",
-  CONFIRMED: "glass-badge-green",
-  COMPLETED: "glass-badge-blue",
-  PENDING: "glass-badge-amber",
-  PENDING_REVIEW: "glass-badge-amber",
-  PENDING_PAYMENT: "glass-badge-amber",
-  UNDER_REVIEW: "glass-badge-amber",
-  REFUND_PENDING: "glass-badge-amber",
-  UNVERIFIED: "glass-badge-neutral",
-  DRAFT: "glass-badge-neutral",
-  REJECTED: "glass-badge-red",
-  PAYMENT_FAILED: "glass-badge-red",
-  DISPUTED: "glass-badge-red",
-  SUSPENDED: "glass-badge-red",
-  CANCELLED: "glass-badge-neutral",
-  REFUNDED: "glass-badge-blue",
-  EXPIRED: "glass-badge-neutral",
-  PAID: "glass-badge-green",
-  PROCESSING: "glass-badge-amber",
-  FAILED: "glass-badge-red",
-  OPEN: "glass-badge-amber",
-  RESOLVED: "glass-badge-green",
-  CLOSED: "glass-badge-neutral",
+const BADGE_THEMES: Record<string, { bg: string; color: string; border: string }> = {
+  VERIFIED: { bg: "rgba(249, 211, 205, 0.12)", color: "#F9D3CD", border: "rgba(249, 211, 205, 0.4)" },
+  ACTIVE: { bg: "rgba(249, 211, 205, 0.12)", color: "#F9D3CD", border: "rgba(249, 211, 205, 0.4)" },
+  CONFIRMED: { bg: "rgba(249, 211, 205, 0.12)", color: "#F9D3CD", border: "rgba(249, 211, 205, 0.4)" },
+  PAID: { bg: "rgba(249, 211, 205, 0.12)", color: "#F9D3CD", border: "rgba(249, 211, 205, 0.4)" },
+  COMPLETED: { bg: "rgba(249, 211, 205, 0.12)", color: "#F9D3CD", border: "rgba(249, 211, 205, 0.4)" },
+  RESOLVED: { bg: "rgba(249, 211, 205, 0.12)", color: "#F9D3CD", border: "rgba(249, 211, 205, 0.4)" },
+  
+  PENDING: { bg: "rgba(255, 200, 100, 0.1)", color: "#FFD285", border: "rgba(255, 200, 100, 0.3)" },
+  PENDING_REVIEW: { bg: "rgba(255, 200, 100, 0.1)", color: "#FFD285", border: "rgba(255, 200, 100, 0.3)" },
+  PENDING_PAYMENT: { bg: "rgba(255, 200, 100, 0.1)", color: "#FFD285", border: "rgba(255, 200, 100, 0.3)" },
+  UNDER_REVIEW: { bg: "rgba(255, 200, 100, 0.1)", color: "#FFD285", border: "rgba(255, 200, 100, 0.3)" },
+  REFUND_PENDING: { bg: "rgba(255, 200, 100, 0.1)", color: "#FFD285", border: "rgba(255, 200, 100, 0.3)" },
+  PROCESSING: { bg: "rgba(255, 200, 100, 0.1)", color: "#FFD285", border: "rgba(255, 200, 100, 0.3)" },
+  OPEN: { bg: "rgba(255, 200, 100, 0.1)", color: "#FFD285", border: "rgba(255, 200, 100, 0.3)" },
+
+  REJECTED: { bg: "rgba(255, 80, 80, 0.15)", color: "#FFAAAA", border: "rgba(255, 80, 80, 0.4)" },
+  PAYMENT_FAILED: { bg: "rgba(255, 80, 80, 0.15)", color: "#FFAAAA", border: "rgba(255, 80, 80, 0.4)" },
+  DISPUTED: { bg: "rgba(255, 80, 80, 0.15)", color: "#FFAAAA", border: "rgba(255, 80, 80, 0.4)" },
+  SUSPENDED: { bg: "rgba(255, 80, 80, 0.15)", color: "#FFAAAA", border: "rgba(255, 80, 80, 0.4)" },
+  FAILED: { bg: "rgba(255, 80, 80, 0.15)", color: "#FFAAAA", border: "rgba(255, 80, 80, 0.4)" },
+
+  UNVERIFIED: { bg: "rgba(249, 211, 205, 0.08)", color: "#F0C4BC", border: "rgba(249, 211, 205, 0.25)" },
+  DRAFT: { bg: "rgba(249, 211, 205, 0.08)", color: "#F0C4BC", border: "rgba(249, 211, 205, 0.25)" },
+  CANCELLED: { bg: "rgba(249, 211, 205, 0.08)", color: "#F0C4BC", border: "rgba(249, 211, 205, 0.25)" },
+  REFUNDED: { bg: "rgba(249, 211, 205, 0.12)", color: "#F9D3CD", border: "rgba(249, 211, 205, 0.4)" },
+  EXPIRED: { bg: "rgba(249, 211, 205, 0.08)", color: "#F0C4BC", border: "rgba(249, 211, 205, 0.25)" },
+  CLOSED: { bg: "rgba(249, 211, 205, 0.08)", color: "#F0C4BC", border: "rgba(249, 211, 205, 0.25)" },
 };
 
+const DEFAULT = { bg: "rgba(249, 211, 205, 0.08)", color: "#F9D3CD", border: "rgba(249, 211, 205, 0.2)" };
+
 export function StatusBadge({ status }: { status: string }) {
-  const cls = COLORS[status] || "glass-badge-neutral";
+  const theme = BADGE_THEMES[status] || DEFAULT;
   return (
     <span
-      className="badge"
-      style={BADGE_STYLES[cls] || BADGE_STYLES["glass-badge-neutral"]}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
+        padding: "4px 10px",
+        fontSize: "0.8125rem",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+        color: theme.color,
+        backgroundColor: theme.bg,
+        border: `1px solid ${theme.border}`,
+        borderRadius: 0,
+      }}
     >
+      <span
+        style={{
+          width: "5px",
+          height: "5px",
+          backgroundColor: theme.color,
+          flexShrink: 0,
+        }}
+      />
       {status.replace(/_/g, " ")}
     </span>
   );
 }
-
-const BADGE_STYLES: Record<string, React.CSSProperties> = {
-  "glass-badge-green": {
-    background: "rgba(34, 197, 94, 0.12)",
-    color: "#4ade80",
-    borderColor: "rgba(34, 197, 94, 0.15)",
-  },
-  "glass-badge-blue": {
-    background: "rgba(59, 130, 246, 0.12)",
-    color: "#60a5fa",
-    borderColor: "rgba(59, 130, 246, 0.15)",
-  },
-  "glass-badge-amber": {
-    background: "rgba(245, 158, 11, 0.12)",
-    color: "#fbbf24",
-    borderColor: "rgba(245, 158, 11, 0.15)",
-  },
-  "glass-badge-red": {
-    background: "rgba(239, 68, 68, 0.12)",
-    color: "#f87171",
-    borderColor: "rgba(239, 68, 68, 0.15)",
-  },
-  "glass-badge-neutral": {
-    background: "rgba(255, 255, 255, 0.06)",
-    color: "rgba(255, 255, 255, 0.55)",
-    borderColor: "rgba(255, 255, 255, 0.08)",
-  },
-};

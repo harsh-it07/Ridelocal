@@ -2,175 +2,549 @@ import { Link } from "react-router-dom";
 
 export function LandingPage() {
   return (
-    <div className="relative overflow-hidden">
-
-      {/* ─── Ambient Orbs (decorative) ──────────────────── */}
-      <div className="ambient-orb" style={{ width: 500, height: 500, top: '-10%', right: '-5%', background: 'radial-gradient(circle, rgba(249, 115, 22,0.25), transparent 70%)', animationDelay: '0s' }} />
-      <div className="ambient-orb" style={{ width: 400, height: 400, bottom: '20%', left: '-8%', background: 'radial-gradient(circle, rgba(249, 115, 22,0.20), transparent 70%)', animationDelay: '5s' }} />
-      <div className="ambient-orb" style={{ width: 300, height: 300, top: '40%', right: '30%', background: 'radial-gradient(circle, rgba(249, 115, 22,0.12), transparent 70%)', animationDelay: '10s' }} />
-
-      {/* ═══ HERO ═══════════════════════════════════════════ */}
-      <section className="relative mx-auto max-w-7xl px-5 pb-16 pt-14 sm:px-8 sm:pt-20 min-h-[85vh] flex flex-col justify-end">
-
-        {/* Service tags — top left */}
-        <div className="absolute top-16 left-5 sm:left-8 sm:top-24 flex flex-col gap-3 animate-slide-left">
-          <span className="glass-tag stagger-1">Bike Rentals</span>
-          <span className="glass-tag stagger-2">Verified Owners</span>
-          <span className="glass-tag stagger-3">Transparent Pricing</span>
+    <div style={{ backgroundColor: "#680A16", color: "#F9D3CD", minHeight: "100vh" }}>
+      {/* ═══ HERO — Direct Pitch Deck Reference Adaptation ═══ */}
+      <section
+        style={{
+          minHeight: "92vh",
+          position: "relative",
+          overflow: "hidden",
+          borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "48px 36px 40px",
+        }}
+      >
+        {/* Tone-on-tone background giant watermark (Right side, like in reference) */}
+        <div
+          style={{
+            position: "absolute",
+            right: "-4vw",
+            top: "50%",
+            transform: "translateY(-49%)",
+            fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+            fontSize: "clamp(10rem, 30vw, 32rem)",
+            lineHeight: 0.72,
+            color: "rgba(78, 5, 14, 0.55)",
+            pointerEvents: "none",
+            userSelect: "none",
+            zIndex: 0,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Ride<br />Local. 
         </div>
 
-        {/* Main heading — massive bold text at bottom */}
-        <div className="mt-40 sm:mt-0">
-          <h1 className="hero-heading animate-fade-up">
-            RIDE<br />LOCAL
-          </h1>
+        {/* Top bar metadata */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+            paddingBottom: "20px",
+          }}
+        >
+          <div>
+            <span
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: "1.125rem",
+                fontWeight: 700,
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: "#FFFFFF",
+              }}
+            >
+              Making Jaipur Mobility Easy ! 
+            </span>
+            <p style={{ fontSize: "1rem", color: "#F0C4BC", margin: "4px 0 0", fontWeight: 600 }}>
+              Rental System Portal
+            </p>
+          </div>
 
-          {/* Bottom row: CTA + description */}
-          <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div style={{ textAlign: "right" }}>
+            <span
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: "1.125rem",
+                fontWeight: 700,
+                letterSpacing: "0.15em",
+                color: "#FFFFFF",
+              }}
+            >
+              EST. 2026
+            </span>
+            <p style={{ fontSize: "1rem", color: "#F0C4BC", margin: "4px 0 0", fontWeight: 600 }}>
+              JAIPUR, RAJASTHAN, INDIA
+            </p>
+          </div>
+        </div>
 
-            {/* CTA button — crystal clear liquid glass */}
-            <div className="animate-fade-up stagger-3">
-              <Link to="/get-started" className="btn-glass group">
-                <span>Get Started</span>
-                <svg
-                  className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+        {/* Main Hero Content: Massive Condensed Typography */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            display: "grid",
+            gridTemplateColumns: "1.2fr 1fr",
+            gap: "56px",
+            alignItems: "flex-end",
+            margin: "44px 0",
+          }}
+          className="hero-main-grid"
+        >
+          {/* Giant Title in Pale Blush Pink */}
+          <div>
+            <h1
+              style={{
+                fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+                fontSize: "clamp(5.5rem, 16vw, 15rem)",
+                lineHeight: 0.84,
+                letterSpacing: "0.01em",
+                color: "#F9D3CD",
+                margin: 0,
+                textTransform: "uppercase",
+              }}
+            >
+              RIDE<br />LOCAL.
+            </h1>
+
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "clamp(1.125rem, 1.6vw, 1.1rem)",
+                lineHeight: 1.6,
+                color: "#F9D3CD",
+                maxWidth: "32rem",
+                marginTop: "24px",
+              }}
+            >
+              Explore the Pink City at your own speed. Rent verified motorcycles, scooters, and e-bikes directly from vetted locals.
+            </p>
+
+            <div style={{ display: "flex", gap: "16px", alignItems: "center", marginTop: "36px", flexWrap: "wrap" }}>
+              <Link to="/search" className="btn-primary" style={{ padding: "16px 36px", fontSize: "1rem" }}>
+                Explore Available Bikes →
+              </Link>
+              <Link to="/get-started?role=OWNER" className="btn-secondary" style={{ padding: "16px 28px", fontSize: "1rem" }}>
+                List Your Bike
               </Link>
             </div>
-
-            {/* Description text — bottom right */}
-            <p className="hero-description animate-slide-right stagger-4">
-              Crafted with precision to create <strong>impactful</strong> and
-              refined local riding experiences across India.
-            </p>
           </div>
-        </div>
-      </section>
 
-      {/* ═══ STATS BENTO ROW ════════════════════════════════ */}
-      <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="card p-7 animate-fade-up stagger-1 hover-lift">
-            <p className="font-display text-4xl font-extrabold text-ink-900">3</p>
-            <p className="mt-2 text-sm text-ink-500">
-              Cities with verified bikes
-            </p>
-          </div>
-          <div className="card p-7 animate-fade-up stagger-2 hover-lift">
-            <div className="flex items-center justify-between">
-              <p className="font-display text-4xl font-extrabold text-ink-900">100%</p>
-              <span className="chip">Verified</span>
-            </div>
-            <p className="mt-2 text-sm text-ink-500">
-              Owners & bikes reviewed by admin
-            </p>
-          </div>
-          <div className="card p-7 animate-fade-up stagger-3 hover-lift animate-pulse-glow">
-            <p className="font-display text-4xl font-extrabold text-ink-900">₹0</p>
-            <p className="mt-2 text-sm text-ink-500">
-              Hidden fees — pricing shown upfront
-            </p>
-          </div>
-        </div>
-      </section>
+          {/* Right Presentation Frame */}
+          <div
+            style={{
+              border: "1px solid rgba(249, 211, 205, 0.35)",
+              padding: "40px",
+              position: "relative",
+              backgroundColor: "rgba(0, 0, 0, 0.2)",
+            }}
+            className="hero-spec-frame"
+          >
+            {/* Corner guide markers */}
+            <div
+              style={{
+                position: "absolute",
+                top: -5,
+                left: -5,
+                width: 9,
+                height: 9,
+                backgroundColor: "#F9D3CD",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                bottom: -5,
+                right: -5,
+                width: 9,
+                height: 9,
+                backgroundColor: "#F9D3CD",
+              }}
+            />
 
-      {/* ═══ HOW IT WORKS ═══════════════════════════════════ */}
-      <section id="how-it-works" className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
-        <div className="text-center mb-12 animate-fade-up">
-          <span className="chip mb-4 inline-block">Simple & Secure</span>
-          <h2 className="font-display text-3xl font-bold sm:text-4xl text-ink-900">
-            How RideLocal works
-          </h2>
-          <p className="mt-3 mx-auto max-w-lg text-ink-500">
-            Three simple steps to your perfect ride — verified, transparent, and ready to go.
-          </p>
-        </div>
-
-        <div className="grid gap-5 sm:grid-cols-3">
-          {[
-            {
-              step: "1",
-              title: "Find a verified bike",
-              desc: "Search by location and dates — every result is owner-verified and admin-approved.",
-              icon: "01",
-            },
-            {
-              step: "2",
-              title: "Verify your licence",
-              desc: "A quick, secure upload keeps the platform safe for owners and travelers alike.",
-              icon: "02",
-            },
-            {
-              step: "3",
-              title: "Book & ride",
-              desc: "Review the full price breakdown, pay securely, and pick up your bike.",
-              icon: "03",
-            },
-          ].map((s) => (
-            <div key={s.step} className={`card p-7 hover-lift animate-fade-up stagger-${s.step}`}>
-              <div className="flex items-center gap-3 mb-4">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl text-xs font-bold tracking-wider bg-brand-50 text-brand-600">
-                  {s.icon}
-                </span>
-                <span className="chip !px-2.5 !py-1 text-xs font-bold" style={{ color: '#fb923c' }}>
-                  Step {s.step}
-                </span>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", borderBottom: "1px solid rgba(249, 211, 205, 0.2)", paddingBottom: "24px" }}>
+              <div>
+                <p style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#F0C4BC", margin: 0 }}>
+                  SERVICE MODEL :
+                </p>
+                <p style={{ fontSize: "1.125rem", color: "#FFFFFF", marginTop: "6px", fontWeight: 700 }}>
+                  P2P Verified Rental
+                </p>
               </div>
-              <h3 className="font-display text-lg font-bold text-ink-900">
-                {s.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-500">
-                {s.desc}
+
+              <div>
+                <p style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#F0C4BC", margin: 0 }}>
+                  LOCATION BASE :
+                </p>
+                <p style={{ fontSize: "1.125rem", color: "#FFFFFF", marginTop: "6px", fontWeight: 700 }}>
+                  Jaipur
+                </p>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "28px" }}>
+              <p
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: "2.75rem",
+                  letterSpacing: "0.04em",
+                  color: "#FFFFFF",
+                  lineHeight: 1,
+                  margin: 0,
+                }}
+              >
+                UNCOMPROMISED TRANSPARENCY
+              </p>
+              <p style={{ fontSize: "1.0625rem", color: "#F0C4BC", marginTop: "12px", lineHeight: 1.65 }}>
+                Every vehicle is verified with original RC documents. Fixed daily pricing, zero hidden surge multipliers, 100% refundable security deposits.
               </p>
             </div>
-          ))}
+
+            <div style={{ marginTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#F9D3CD" }}>
+                
+              </span>
+              <Link to="/search" style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#FFFFFF", textDecoration: "none", borderBottom: "1px solid #FFFFFF", paddingBottom: "2px", letterSpacing: "0.08em" }}>
+                Browse Catalog →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Hero Metadata Strip */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderTop: "1px solid rgba(249, 211, 205, 0.2)",
+            paddingTop: "20px",
+            flexWrap: "wrap",
+            gap: "16px",
+          }}
+        >
+          <span style={{ fontFamily: "'Barlow Condensed'", fontSize: "1.25rem", fontWeight: 700, letterSpacing: "0.12em", color: "#F9D3CD" }}>
+            BY : HARSHIT SHARMA
+          </span>
+          <span style={{ fontFamily: "'Barlow Condensed'", fontSize: "1.25rem", fontWeight: 700, letterSpacing: "0.12em", color: "#FFFFFF", textTransform: "uppercase" }}>
+            TOURIST MOBILITY & INDEPENDENT TRAVEL FACILITY
+
+          </span>
         </div>
       </section>
 
-      {/* ═══ OWNER CTA ══════════════════════════════════════ */}
-      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
-        <div className="glass-panel p-10 sm:p-14 text-center animate-fade-up">
-          <div className="ambient-orb" style={{ width: 200, height: 200, top: '-20%', left: '10%', background: 'radial-gradient(circle, rgba(249, 115, 22,0.20), transparent 70%)', animationDelay: '3s' }} />
-
-          <span className="chip mb-5 inline-block">For Owners</span>
-          <h2 className="font-display text-3xl font-bold sm:text-4xl text-ink-900">
-            Have a bike sitting idle?
-          </h2>
-          <p className="mt-4 mx-auto max-w-lg text-ink-500">
-            List it on RideLocal, set your price and availability, and start earning
-            from travelers exploring your city.
-          </p>
-          <Link to="/get-started?role=OWNER" className="btn-glass mt-8 inline-flex">
-            List your bike
-            <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </Link>
+      {/* ═══ SEARCH QUICK BAR — Crimson Strip ═══ */}
+      <section style={{ backgroundColor: "#4E050E", borderBottom: "1px solid rgba(249, 211, 205, 0.2)" }}>
+        <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", alignItems: "center" }} className="search-strip">
+            <div style={{ padding: "28px 0", borderRight: "1px solid rgba(249, 211, 205, 0.2)" }}>
+              <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>
+                LOCATION
+              </p>
+              <p style={{ fontFamily: "'Barlow Condensed'", fontSize: "1.5rem", fontWeight: 700, color: "#FFFFFF", marginTop: "4px", letterSpacing: "0.04em", margin: 0 }}>
+                JAIPUR ALL HUBS
+              </p>
+            </div>
+            <div style={{ padding: "28px 32px", borderRight: "1px solid rgba(249, 211, 205, 0.2)" }}>
+              <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>
+                DURATION
+              </p>
+              <p style={{ fontFamily: "'Barlow Condensed'", fontSize: "1.5rem", fontWeight: 700, color: "#F9D3CD", marginTop: "4px", letterSpacing: "0.04em", margin: 0 }}>
+                DAILY / MULTI-DAY
+              </p>
+            </div>
+            <div style={{ padding: "28px 32px", borderRight: "1px solid rgba(249, 211, 205, 0.2)" }}>
+              <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>
+                VEHICLE
+              </p>
+              <p style={{ fontFamily: "'Barlow Condensed'", fontSize: "1.5rem", fontWeight: 700, color: "#F9D3CD", marginTop: "4px", letterSpacing: "0.04em", margin: 0 }}>
+                MOTORCYCLE / SCOOTER
+              </p>
+            </div>
+            <div style={{ padding: "28px 32px", textAlign: "right" }}>
+              <Link
+                to="/search"
+                className="btn-primary"
+                style={{ padding: "14px 32px", fontSize: "0.9375rem" }}
+              >
+                Search Fleet →
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ═══ FOOTER ═════════════════════════════════════════ */}
-      <footer className="mx-auto max-w-7xl px-5 pb-10 pt-8 sm:px-8 border-t border-neutral-200">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-ink-500">
-            © 2026 RideLocal. Verified rides, honest pricing.
-          </p>
-          <div className="flex items-center gap-5">
-            <Link to="/search" className="text-sm transition-colors hover:text-ink-900 text-ink-500">
-              Explore
-            </Link>
-            <Link to="/get-started" className="text-sm transition-colors hover:text-ink-900 text-ink-500">
-              Get Started
-            </Link>
-            <Link to="/login" className="text-sm transition-colors hover:text-ink-900 text-ink-500">
-              Login
-            </Link>
+      {/* ═══ HOW IT WORKS — Numbered Editorial ═══ */}
+      <section id="how-it-works" style={{ padding: "96px 0", borderBottom: "1px solid rgba(249, 211, 205, 0.2)" }}>
+        <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "64px", flexWrap: "wrap", gap: "24px" }}>
+            <div>
+              <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em", margin: 0 }}>
+                THE PROCESS
+              </p>
+              <h2
+                style={{
+                  fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+                  fontSize: "clamp(2.75rem, 6vw, 4.75rem)",
+                  lineHeight: 0.95,
+                  letterSpacing: "0.02em",
+                  color: "#F9D3CD",
+                  margin: "8px 0 0",
+                  textTransform: "uppercase",
+                }}
+              >
+                HOW IT WORKS.
+              </h2>
+            </div>
+            <p style={{ fontSize: "1.125rem", color: "#F0C4BC", maxWidth: "28rem", margin: 0, lineHeight: 1.65 }}>
+              Three direct steps from searching verified listings to exploring the historic roads of Rajasthan.
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0" }} className="steps-grid">
+            {[
+              {
+                num: "01",
+                title: "SELECT YOUR BIKE",
+                desc: "Choose from Royal Enfield tourers, city scooters, or electric rides. Filter by pick-up hubs across Jaipur.",
+              },
+              {
+                num: "02",
+                title: "CONFIRM & VERIFY",
+                desc: "Upload your driving licence once. Transparent daily rates, no hidden surcharges, fully refundable security deposit.",
+              },
+              {
+                num: "03",
+                title: "PICK UP & RIDE",
+                desc: "Meet the verified local owner at your selected hub. Inspect the two-wheeler, receive two ISI helmets, and head out.",
+              },
+            ].map((s, i) => (
+              <div
+                key={s.num}
+                style={{
+                  padding: i === 0 ? "0 48px 0 0" : "0 48px",
+                  borderLeft: i > 0 ? "1px solid rgba(249, 211, 205, 0.2)" : "none",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: "5rem",
+                    fontWeight: 800,
+                    color: "#F9D3CD",
+                    lineHeight: 1,
+                  }}
+                >
+                  {s.num}
+                </span>
+                <h3
+                  style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: "1.75rem",
+                    fontWeight: 700,
+                    color: "#FFFFFF",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                    marginTop: "16px",
+                  }}
+                >
+                  {s.title}
+                </h3>
+                <p style={{ fontSize: "1.0625rem", color: "#F0C4BC", lineHeight: 1.65, marginTop: "12px" }}>
+                  {s.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ OWNER SECTION — Deep Wine Contrast ═══ */}
+      <section style={{ backgroundColor: "#4E050E", padding: "96px 0", borderBottom: "1px solid rgba(249, 211, 205, 0.2)" }}>
+        <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "64px", alignItems: "center" }} className="owner-grid">
+            <div>
+              <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em", margin: 0 }}>
+                FOR LOCAL BIKE OWNERS
+              </p>
+              <h2
+                style={{
+                  fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+                  fontSize: "clamp(3rem, 7vw, 5.5rem)",
+                  lineHeight: 0.92,
+                  color: "#F9D3CD",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.01em",
+                  marginTop: "8px",
+                }}
+              >
+                YOUR BIKE.<br />EARNING DAILY.
+              </h2>
+              <p style={{ fontSize: "1.125rem", color: "#F0C4BC", lineHeight: 1.65, marginTop: "24px", maxWidth: "34rem" }}>
+                Turn your idle two-wheeler into steady income. We verify tourist identities, manage payment escrow, and handle booking agreements for you.
+              </p>
+              <div style={{ marginTop: "36px", display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                <Link to="/get-started?role=OWNER" className="btn-primary" style={{ padding: "16px 36px", fontSize: "0.9375rem" }}>
+                  List Your Bike Now →
+                </Link>
+                <Link to="/login" className="btn-secondary" style={{ padding: "16px 28px", fontSize: "0.9375rem" }}>
+                  Owner Portal
+                </Link>
+              </div>
+            </div>
+
+            <div style={{ border: "1px solid rgba(249, 211, 205, 0.25)", overflow: "hidden", position: "relative" }}>
+              <img
+                src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80"
+                alt="Motorcycle on Jaipur highway"
+                style={{ width: "100%", height: "440px", objectFit: "cover", display: "block" }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: "rgba(78, 5, 14, 0.9)",
+                  padding: "18px 24px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <span style={{ fontFamily: "'Barlow Condensed'", fontSize: "1.125rem", fontWeight: 700, letterSpacing: "0.1em", color: "#FFFFFF" }}>
+                  VERIFIED OWNERS ACROSS JAIPUR
+                </span>
+                <span style={{ fontSize: "0.9375rem", color: "#F9D3CD", fontWeight: 700 }}>100% ID SCREENED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ TRUST & IDENTITY ═══ */}
+      <section style={{ padding: "88px 0", borderBottom: "1px solid rgba(249, 211, 205, 0.2)" }}>
+        <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", alignItems: "center" }} className="trust-grid">
+            <div>
+              <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em", margin: 0 }}>
+                SAFETY & VERIFICATION
+              </p>
+              <h2
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                  lineHeight: 0.95,
+                  color: "#FFFFFF",
+                  letterSpacing: "0.02em",
+                  marginTop: "8px",
+                }}
+              >
+                NO ANONYMOUS RENTALS.
+              </h2>
+            </div>
+            <div>
+              <p style={{ fontSize: "1.125rem", color: "#F0C4BC", lineHeight: 1.7 }}>
+                Every rider undergoes driving licence validation before a booking can be confirmed. Vehicle registration papers (RC) and owner IDs are audited by human administrators.
+              </p>
+              <div style={{ display: "flex", gap: "36px", marginTop: "28px" }}>
+                <div>
+                  <p style={{ fontFamily: "'Bebas Neue'", fontSize: "2.5rem", color: "#F9D3CD", margin: 0 }}>100%</p>
+                  <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", margin: 0, textTransform: "uppercase", fontWeight: 700 }}>Verified Licences</p>
+                </div>
+                <div>
+                  <p style={{ fontFamily: "'Bebas Neue'", fontSize: "2.5rem", color: "#F9D3CD", margin: 0 }}>₹0</p>
+                  <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", margin: 0, textTransform: "uppercase", fontWeight: 700 }}>Surge Multipliers</p>
+                </div>
+                <div>
+                  <p style={{ fontFamily: "'Bebas Neue'", fontSize: "2.5rem", color: "#F9D3CD", margin: 0 }}>24/7</p>
+                  <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", margin: 0, textTransform: "uppercase", fontWeight: 700 }}>Jaipur Support</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FOOTER ═══ */}
+      <footer style={{ padding: "64px 0 40px", backgroundColor: "#4E050E" }}>
+        <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 24px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "36px" }}>
+            <div>
+              <p
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: "2.75rem",
+                  color: "#F9D3CD",
+                  letterSpacing: "0.02em",
+                  margin: 0,
+                  lineHeight: 1,
+                }}
+              >
+                RIDE <span style={{ opacity: 0.65 }}>LOCAL</span>
+              </p>
+              <p style={{ fontSize: "1.0625rem", color: "#F0C4BC", marginTop: "12px", maxWidth: "24rem", lineHeight: 1.65 }}>
+                Jaipur tourist two-wheeler rental marketplace. Connecting travelers directly with local verified bike owners.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "56px", flexWrap: "wrap" }}>
+              <div>
+                <p style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#FFFFFF", margin: 0 }}>
+                  EXPLORE
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "16px" }}>
+                  <Link to="/search" style={{ fontSize: "1rem", color: "#F0C4BC", textDecoration: "none", fontWeight: 600 }}>All Bikes</Link>
+                  <Link to="/#how-it-works" style={{ fontSize: "1rem", color: "#F0C4BC", textDecoration: "none", fontWeight: 600 }}>How It Works</Link>
+                  <Link to="/get-started?role=OWNER" style={{ fontSize: "1rem", color: "#F0C4BC", textDecoration: "none", fontWeight: 600 }}>List a Bike</Link>
+                </div>
+              </div>
+
+              <div>
+                <p style={{ fontSize: "0.9375rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#FFFFFF", margin: 0 }}>
+                  ACCOUNT
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "16px" }}>
+                  <Link to="/login" style={{ fontSize: "1rem", color: "#F0C4BC", textDecoration: "none", fontWeight: 600 }}>Login</Link>
+                  <Link to="/register" style={{ fontSize: "1rem", color: "#F0C4BC", textDecoration: "none", fontWeight: 600 }}>Sign Up</Link>
+                  <Link to="/verification" style={{ fontSize: "1rem", color: "#F0C4BC", textDecoration: "none", fontWeight: 600 }}>Verification</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: "48px", borderTop: "1px solid rgba(249, 211, 205, 0.15)", paddingTop: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+            <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", margin: 0, fontWeight: 500 }}>
+              © 2026 RIDELOCAL. JAIPUR, RAJASTHAN. ALL RIGHTS RESERVED.
+            </p>
+            <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", margin: 0, fontWeight: 500 }}>
+              DESIGNED IN JAIPUR · PURE EDITORIAL
+            </p>
           </div>
         </div>
       </footer>
+
+      {/* Responsive Styles */}
+      <style>{`
+        @media (max-width: 900px) {
+          .hero-main-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .hero-spec-frame { padding: 28px !important; }
+          .search-strip { grid-template-columns: 1fr 1fr !important; }
+          .steps-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+          .steps-grid > div { border-left: none !important; padding: 0 !important; border-bottom: 1px solid rgba(249, 211, 205, 0.2); padding-bottom: 28px !important; }
+          .steps-grid > div:last-child { border-bottom: none; }
+          .owner-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .trust-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+        }
+      `}</style>
     </div>
   );
 }

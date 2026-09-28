@@ -1,215 +1,140 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, getErrorMessage } from "../../api/client";
+import { Loader } from "../../components/Loader";
 import { PaymentMethod } from "../../types";
 
-type Stage = "select" | "processing" | "success" | "failed";
-
-const METHODS: { id: PaymentMethod; label: string; icon: string }[] = [
-  { id: "UPI", label: "UPI", icon: "UP" },
-  { id: "CARD", label: "Credit / Debit Card", icon: "CD" },
-  { id: "NETBANKING", label: "Net Banking", icon: "NB" },
-  { id: "WALLET", label: "Wallet", icon: "WL" },
+const PAYMENT_METHODS: { id: PaymentMethod; label: string; desc: string }[] = [
+  { id: "UPI", label: "UPI Instant Transfer", desc: "Google Pay, PhonePe, Paytm" },
+  { id: "CARD", label: "Credit / Debit Card", desc: "Visa, Mastercard, RuPay" },
+  { id: "NETBANKING", label: "Net Banking", desc: "HDFC, SBI, ICICI, Axis" },
+  { id: "WALLET", label: "RideLocal Wallet Balance", desc: "Test environment wallet" },
 ];
 
 export function PaymentPage() {
-  const { id } = useParams();
+  const { id: bookingId } = useParams();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const [modalOpen, setModalOpen] = useState(false);
-  const [stage, setStage] = useState<Stage>("select");
-  const [method, setMethod] = useState<PaymentMethod>("UPI");
-  const [providerRef, setProviderRef] = useState<string | null>(null);
-  const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("UPI");
+  const [stage, setStage] = useState<"select" | "processing" | "success" | "failed">("select");
+  const [txnId, setTxnId] = useState<string | null>(null);
 
   useEffect(() => {
-    api
-      .get(`/bookings/${id}`)
+    api.get(`/bookings/${bookingId}`)
       .then(({ data }) => setBooking(data.booking))
       .catch((err) => setError(getErrorMessage(err)));
-  }, [id]);
+  }, [bookingId]);
 
-  async function openGateway() {
-    setError(null);
-    setModalOpen(true);
-    setStage("select");
-  }
-
-  async function payWithMethod() {
-    setStage("processing");
+  async function executePay() {
+    setStage("processing"); setError(null);
     try {
-      // 1) Real backend call — creates an actual Payment row (PROCESSING).
-      const { data: order } = await api.post("/payments/mock/create", {
-        bookingId: id,
-        method,
-      });
-      setProviderRef(order.providerRef);
-
-      // Small delay so "Payment Processing..." reads as a real gateway
-      // round-trip rather than an instant flash.
-      await new Promise((r) => setTimeout(r, 1400));
-
-      // 2) Real backend call — confirms the (simulated) charge and moves
-      // the booking to CONFIRMED. Nothing about success is decided client-side.
-      const { data: result } = await api.post("/payments/mock/confirm", {
-        providerRef: order.providerRef,
-        proof: {},
-      });
-      setTransactionId(result.payment.transactionId);
+      const { data: order } = await api.post("/payments/mock/create", { bookingId, method: paymentMethod });
+      await new Promise((r) => setTimeout(r, 1200));
+      const { data: result } = await api.post("/payments/mock/confirm", { providerRef: order.providerRef, proof: {} });
+      setTxnId(result.payment?.transactionId || "MOCK_TXN_OK");
       setStage("success");
-    } catch (err) {
-      setError(getErrorMessage(err));
-      setStage("failed");
-    }
+    } catch (err) { setError(getErrorMessage(err)); setStage("failed"); }
   }
 
-  function finish() {
-    setModalOpen(false);
-    navigate(`/bookings/${id}`);
-  }
-
-  if (!booking) return <div className="mx-auto max-w-lg px-4 py-10 text-ink-500">Loading...</div>;
+  if (error && !booking) return <div style={{ maxWidth: "520px", margin: "0 auto", padding: "56px 24px", color: "#FFAAAA", fontSize: "1.0625rem" }}>{error}</div>;
+  if (!booking) return <div style={{ maxWidth: "520px", margin: "0 auto", padding: "56px 24px" }}><Loader message="Loading payment record..." size="lg" /></div>;
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-10">
-      <div className="card p-6">
-        <h1 className="font-display text-xl font-bold text-ink-900">Confirm & pay</h1>
-        <p className="mt-1 text-sm text-ink-500">
-          {booking.vehicle?.brand} {booking.vehicle?.model}
-        </p>
+    <div style={{ maxWidth: "520px", margin: "0 auto", padding: "56px 24px" }}>
+      {stage === "select" && (
+        <>
+          <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+            ESCROW PAYMENT GATEWAY
+          </p>
+          <h1 style={{ fontFamily: "'Bebas Neue'", fontSize: "3.5rem", color: "#F9D3CD", margin: "4px 0 0", letterSpacing: "0.01em" }}>
+            ₹{booking.totalAmount}
+          </h1>
+          <p style={{ fontSize: "0.9375rem", color: "#FFFFFF", marginTop: "4px" }}>
+            {booking.vehicle?.brand} {booking.vehicle?.model} · {new Date(booking.startTime).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} – {new Date(booking.endTime).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+          </p>
 
-        {/* Pricing breakdown — light bg with BLACK text for readability */}
-        <div
-          className="mt-4 space-y-2 rounded-xl bg-white/60 p-4 text-sm"
-        >
-          <Row label="Rental amount" value={booking.rentalAmount} />
-          <Row label="Platform fee" value={booking.platformFee} />
-          <Row label="Refundable security deposit" value={booking.securityDeposit} />
-          <div
-            className="mt-2 flex justify-between pt-2 font-bold"
-            style={{ borderTop: '1px solid rgba(0,0,0,0.10)', color: '#111827' }}
-          >
-            <span>Total payable now</span>
-            <span>₹{booking.totalAmount}</span>
+          <div style={{ marginTop: "36px" }}>
+            <label className="label">Select Payment Method</label>
+            {PAYMENT_METHODS.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setPaymentMethod(m.id)}
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "16px",
+                  marginBottom: "8px",
+                  border: paymentMethod === m.id ? "1px solid #F9D3CD" : "1px solid rgba(249, 211, 205, 0.2)",
+                  backgroundColor: paymentMethod === m.id ? "rgba(249, 211, 205, 0.12)" : "rgba(0, 0, 0, 0.2)",
+                  cursor: "pointer",
+                  textAlign: "left",
+                }}
+              >
+                <div>
+                  <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>{m.label}</p>
+                  <p style={{ fontSize: "0.8125rem", color: "#F0C4BC", margin: "2px 0 0" }}>{m.desc}</p>
+                </div>
+                <div
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    border: paymentMethod === m.id ? "5px solid #F9D3CD" : "1px solid rgba(249, 211, 205, 0.4)",
+                  }}
+                />
+              </button>
+            ))}
           </div>
+
+          {error && <p style={{ fontSize: "0.875rem", color: "#FFAAAA", marginTop: "14px" }}>{error}</p>}
+
+          <button
+            type="button"
+            onClick={executePay}
+            className="btn-primary"
+            style={{ width: "100%", marginTop: "28px", padding: "16px", fontSize: "0.9375rem" }}
+          >
+            Authorize Payment ₹{booking.totalAmount} →
+          </button>
+        </>
+      )}
+
+      {stage === "processing" && (
+        <div style={{ textAlign: "center", padding: "80px 0" }}>
+          <div className="loader loader-md" style={{ margin: "0 auto" }} />
+          <p style={{ fontFamily: "'Bebas Neue'", fontSize: "2rem", color: "#F9D3CD", marginTop: "24px", letterSpacing: "0.02em" }}>PROCESSING ESCROW</p>
+          <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "4px" }}>Connecting to {paymentMethod} secure gateway...</p>
         </div>
+      )}
 
-        {error && !modalOpen && <p className="mt-3 text-sm" style={{ color: '#f87171' }}>{error}</p>}
-
-        <button onClick={openGateway} className="btn-primary mt-5 w-full">
-          Pay ₹{booking.totalAmount}
-        </button>
-        <p className="mt-2 text-center text-xs text-ink-500">
-          Simulated payment gateway — no real money is charged. Real backend records are still
-          created for this transaction.
-        </p>
-      </div>
-
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-ink-900/40">
-          <div className="card w-full max-w-sm p-6">
-            {stage === "select" && (
-              <>
-                <p className="text-xs font-medium uppercase tracking-wide text-ink-500">
-                  RideLocal Pay (test mode)
-                </p>
-                <p className="mt-1 font-display text-2xl font-extrabold text-ink-900">
-                  ₹{booking.totalAmount}
-                </p>
-
-                {/* Payment method buttons — light bg with BLACK text */}
-                <div className="mt-5 space-y-2">
-                  {METHODS.map((m) => (
-                    <button
-                      key={m.id}
-                      onClick={() => setMethod(m.id)}
-                      className="flex w-full items-center gap-3 rounded-xl border px-3.5 py-2.5 text-left text-sm transition-all duration-200"
-                      style={{
-                        background: method === m.id
-                          ? 'rgba(255,255,255,0.90)'
-                          : 'rgba(255,255,255,0.80)',
-                        borderColor: method === m.id
-                          ? '#fb923c'
-                          : 'rgba(255,255,255,0.30)',
-                        boxShadow: method === m.id
-                          ? '0 0 0 2px rgba(249, 115, 22,0.20)'
-                          : 'none',
-                      }}
-                    >
-                      <span className="text-xs font-bold" style={{ color: '#fb923c' }}>{m.icon}</span>
-                      <span className="font-medium text-ink-900">{m.label}</span>
-                      {method === m.id && <span className="ml-auto text-brand-600">●</span>}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mt-5 flex gap-2">
-                  <button onClick={() => setModalOpen(false)} className="btn-secondary flex-1">
-                    Cancel
-                  </button>
-                  <button onClick={payWithMethod} className="btn-primary flex-1">
-                    Pay now
-                  </button>
-                </div>
-              </>
-            )}
-
-            {stage === "processing" && (
-              <div className="flex flex-col items-center gap-3 py-8 text-center">
-                <div className="h-10 w-10 animate-spin rounded-full border-4" style={{ borderColor: 'rgba(249, 115, 22,0.20)', borderTopColor: '#fb923c' }} />
-                <p className="font-medium text-ink-900">Payment processing…</p>
-                <p className="text-sm text-ink-500">Confirming with {method}, please wait.</p>
-              </div>
-            )}
-
-            {stage === "success" && (
-              <div className="flex flex-col items-center gap-2 py-6 text-center">
-                <span
-                  className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
-                  style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80' }}
-                >
-                  ✓
-                </span>
-                <p className="font-display font-bold text-ink-900">Payment successful</p>
-                <p className="text-sm text-ink-500">Your booking is now confirmed.</p>
-                {transactionId && (
-                  <p className="mt-1 font-mono text-xs text-ink-500">{transactionId}</p>
-                )}
-                <button onClick={finish} className="btn-primary mt-4 w-full">
-                  View booking
-                </button>
-              </div>
-            )}
-
-            {stage === "failed" && (
-              <div className="flex flex-col items-center gap-2 py-6 text-center">
-                <span
-                  className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
-                  style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171' }}
-                >
-                  ✕
-                </span>
-                <p className="font-display font-bold text-ink-900">Payment failed</p>
-                <p className="text-sm text-ink-500">{error || "Something went wrong."}</p>
-                <button onClick={() => setStage("select")} className="btn-primary mt-4 w-full">
-                  Try again
-                </button>
-              </div>
-            )}
+      {stage === "success" && (
+        <div style={{ textAlign: "center", padding: "64px 0" }}>
+          <p style={{ fontFamily: "'Bebas Neue'", fontSize: "3.5rem", color: "#F9D3CD", margin: 0 }}>✓ PAYMENT COMPLETE</p>
+          <p style={{ fontSize: "0.9375rem", color: "#FFFFFF", marginTop: "8px", fontWeight: 600 }}>Escrow transaction ref: {txnId}</p>
+          <div style={{ display: "flex", gap: "10px", marginTop: "32px" }}>
+            <button onClick={() => navigate(`/bookings/${bookingId}`)} className="btn-primary" style={{ flex: 1, padding: "14px", fontSize: "0.9375rem" }}>
+              View Booking
+            </button>
+            <button onClick={() => navigate("/bookings")} className="btn-secondary" style={{ flex: 1, padding: "14px", fontSize: "0.9375rem" }}>
+              My Rides
+            </button>
           </div>
         </div>
       )}
-    </div>
-  );
-}
 
-function Row({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="flex justify-between" style={{ color: '#374151' }}>
-      <span>{label}</span>
-      <span>₹{value}</span>
+      {stage === "failed" && (
+        <div style={{ textAlign: "center", padding: "64px 0" }}>
+          <p style={{ fontFamily: "'Bebas Neue'", fontSize: "2.5rem", color: "#FFAAAA", margin: 0 }}>✕ TRANSACTION FAILED</p>
+          <p style={{ fontSize: "0.875rem", color: "#FFAAAA", marginTop: "6px" }}>{error}</p>
+          <button onClick={() => { setStage("select"); setError(null); }} className="btn-primary" style={{ width: "100%", marginTop: "24px", padding: "14px", fontSize: "0.9375rem" }}>
+            Try Again
+          </button>
+        </div>
+      )}
     </div>
   );
 }

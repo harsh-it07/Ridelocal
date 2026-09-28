@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, getErrorMessage } from "../../api/client";
 import { StatusBadge } from "../../components/StatusBadge";
+import { Loader } from "../../components/Loader";
 import { Vehicle } from "../../types";
 import { useAuth } from "../../context/AuthContext";
 
@@ -20,79 +21,137 @@ export function OwnerDashboardPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="flex items-center justify-between">
+    <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "56px 24px" }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "24px" }}>
         <div>
-          <h1 className="font-display text-2xl font-bold text-ink-900">Owner dashboard</h1>
-          <p className="mt-1 text-sm text-ink-500">
-            Verification: <StatusBadge status={user?.verificationStatus || "UNVERIFIED"} />
+          <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+            OWNER FLEET PORTAL
           </p>
+          <h1
+            style={{
+              fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+              fontSize: "clamp(3rem, 7vw, 5rem)",
+              lineHeight: 0.9,
+              letterSpacing: "0.01em",
+              color: "#F9D3CD",
+              textTransform: "uppercase",
+              margin: "6px 0 0",
+            }}
+          >
+            GARAGE & LISTINGS.
+          </h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "10px" }}>
+            <span style={{ fontSize: "0.875rem", color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>Account:</span>
+            <StatusBadge status={user?.verificationStatus || "UNVERIFIED"} />
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Link to="/owner/bookings" className="btn-secondary">
+
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <Link to="/owner/bookings" className="btn-secondary" style={{ padding: "12px 20px", fontSize: "0.9375rem" }}>
             Bookings
           </Link>
-          <Link to="/owner/earnings" className="btn-secondary">
+          <Link to="/owner/earnings" className="btn-secondary" style={{ padding: "12px 20px", fontSize: "0.9375rem" }}>
             Earnings
           </Link>
-          <Link to="/owner/vehicles/new" className="btn-primary">
-            + Add vehicle
+          <Link to="/owner/vehicles/new" className="btn-primary" style={{ padding: "12px 24px", fontSize: "0.9375rem" }}>
+            + Add Vehicle
           </Link>
         </div>
       </div>
 
+      {/* Verification notice if unverified */}
       {user?.verificationStatus !== "VERIFIED" && (
-        <div className="mt-5 glass p-5 flex flex-col sm:flex-row items-center justify-between gap-4 border border-orange-500/20 relative overflow-hidden" style={{ background: 'rgba(249, 115, 22, 0.05)' }}>
-          {/* Subtle glow effect behind the text */}
-          <div className="absolute -left-20 -top-20 w-64 h-64 rounded-full pointer-events-none" style={{ background: 'rgba(249, 115, 22, 0.1)', filter: 'blur(80px)' }}></div>
-          
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-[0_0_15px_rgba(249,115,22,0.2)]" style={{ background: 'rgba(249, 115, 22, 0.15)', color: '#fb923c' }}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-semibold text-ink-900 mb-1 text-base">Action Required: Verify Account</h3>
-              <p className="text-sm text-ink-500">
-                Complete <Link to="/verification" className="text-brand-600 font-semibold hover:text-orange-300 transition-colors hover:underline">owner verification</Link> to get your vehicles approved faster.
-              </p>
-            </div>
+        <div
+          style={{
+            marginTop: "36px",
+            padding: "24px 28px",
+            backgroundColor: "#4E050E",
+            border: "1px solid rgba(255, 200, 100, 0.4)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "20px",
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <h3 style={{ fontFamily: "'Bebas Neue'", fontSize: "1.75rem", color: "#FFD285", margin: 0, letterSpacing: "0.02em" }}>
+              ACTION REQUIRED: VERIFY OWNER ID
+            </h3>
+            <p style={{ fontSize: "0.9375rem", color: "#FFFFFF", marginTop: "4px" }}>
+              Complete identity and vehicle document checks to approve your listings for tourist rentals.
+            </p>
           </div>
-          
-          <Link to="/verification" className="btn-primary shrink-0 relative z-10 !py-2.5 !px-5 shadow-[0_0_20px_rgba(249,115,22,0.3)]">
-            Verify Now
+          <Link to="/verification" className="btn-primary" style={{ padding: "12px 24px", whiteSpace: "nowrap" }}>
+            Verify Identity →
           </Link>
         </div>
       )}
 
-      {loading && <p className="mt-6 text-ink-500">Loading...</p>}
-      {error && <p className="mt-6 text-red-600">{error}</p>}
+      {loading && <Loader message="Loading your garage..." />}
+      {error && <p style={{ marginTop: "36px", color: "#FFAAAA", fontSize: "1.0625rem" }}>{error}</p>}
 
-      <div className="mt-6 space-y-3">
+      {/* Vehicle Listings Rows */}
+      <div style={{ marginTop: "40px", borderTop: "1px solid rgba(249, 211, 205, 0.3)" }}>
         {vehicles.map((v) => (
-          <div key={v.id} className="card flex items-center justify-between p-4">
+          <div
+            key={v.id}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "24px 0",
+              borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+              gap: "20px",
+              flexWrap: "wrap",
+            }}
+          >
             <div>
-              <p className="font-semibold text-ink-900">
+              <p
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "1.625rem",
+                  color: "#FFFFFF",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.02em",
+                  margin: 0,
+                }}
+              >
                 {v.brand} {v.model}
               </p>
-              <p className="text-sm text-ink-500">
-                ₹{v.pricePerDay}/day · {v.city}
+              <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "6px", fontWeight: 500 }}>
+                ₹{v.pricePerDay}/day · {v.city} · {v.vehicleType} · Reg: {v.registrationReference}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
               <StatusBadge status={v.status} />
               <StatusBadge status={v.verificationStatus} />
-              <Link to={`/owner/vehicles/${v.id}/edit`} className="btn-secondary !py-1.5 !px-3 text-sm">
-                Manage
+              <Link
+                to={`/owner/vehicles/${v.id}/edit`}
+                className="btn-secondary"
+                style={{ padding: "10px 20px", fontSize: "0.875rem" }}
+              >
+                Manage →
               </Link>
             </div>
           </div>
         ))}
+
         {!loading && vehicles.length === 0 && (
-          <p className="text-ink-500">
-            No vehicles yet. <Link to="/owner/vehicles/new" className="text-brand-600 font-medium">Add your first one</Link>.
-          </p>
+          <div style={{ padding: "56px 0", textAlign: "left" }}>
+            <p style={{ color: "#F0C4BC", fontSize: "1.0625rem" }}>
+              No vehicles listed in your garage yet.
+            </p>
+            <Link
+              to="/owner/vehicles/new"
+              className="btn-primary"
+              style={{ marginTop: "16px", display: "inline-block" }}
+            >
+              List Your First Bike →
+            </Link>
+          </div>
         )}
       </div>
     </div>

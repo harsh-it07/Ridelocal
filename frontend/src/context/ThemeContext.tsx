@@ -1,10 +1,9 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext } from "react";
 
-// Simplified: single warm-dark theme, no toggle needed.
-// The liquid glass aesthetic uses one consistent warm gradient canvas.
-// We keep the provider structure for API compatibility with other pages.
+// RideLocal v3 — Single light/cream theme. No toggling needed.
+// Provider kept for API compatibility with existing imports.
 
-type Theme = "dark";
+type Theme = "light";
 
 interface ThemeContextValue {
   theme: Theme;
@@ -12,19 +11,13 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: "dark",
+  theme: "light",
   toggleTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    // Apply dark class for any Tailwind dark: utilities still in use
-    document.documentElement.classList.add("dark");
-    document.body.classList.add("dark");
-  }, []);
-
   return (
-    <ThemeContext.Provider value={{ theme: "dark", toggleTheme: () => {} }}>
+    <ThemeContext.Provider value={{ theme: "light", toggleTheme: () => {} }}>
       {children}
     </ThemeContext.Provider>
   );

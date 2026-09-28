@@ -1,20 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/* ─── Main component ───────────────────────────────────── */
 export function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    function onScroll() { setScrolled(window.scrollY > 8); }
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   async function handleLogout() {
     await logout();
@@ -23,120 +14,259 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { to: "/search",                 label: "Explore Bikes" },
-    { to: "/#how-it-works",          label: "How It Works"  },
-    { to: "/get-started?role=OWNER", label: "List Your Bike"},
+    { to: "/search", label: "Explore" },
+    { to: "/#how-it-works", label: "Home" },
+    { to: "/get-started?role=OWNER", label: "Get Started" },
   ];
 
   return (
-    <header className="navbar-wrap sticky top-0 z-40 flex justify-center px-4 py-3 pointer-events-none">
+    <header
+      className="navbar-wrap"
+      style={{
+        background: "#680A16",
+        borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+        position: "sticky",
+        top: 0,
+        zIndex: 40,
+      }}
+    >
+      <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "60px" }}>
 
-      {/* ── Liquid Glass Panel Navbar ── */}
-      <div
-        className={`navbar-capsule pointer-events-auto w-full max-w-5xl
-          ${scrolled    ? "scrolled"  : ""}
-          ${mobileOpen  ? "menu-open" : ""}
-        `}
-      >
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-5 py-3 sm:px-6">
-
-          {/* Logo */}
+          {/* Logo — Tall Condensed Bebas Neue in Blush Pink */}
           <Link
             to="/"
-            className="flex items-center gap-2 font-display text-lg font-bold tracking-tight text-ink-900 hover:opacity-80 transition-opacity"
+            style={{
+              fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+              fontSize: "2rem",
+              letterSpacing: "0.03em",
+              color: "#F9D3CD",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              lineHeight: 1,
+            }}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-500/25 text-sm font-bold flex-shrink-0">
-              R
-            </span>
-            <span className="text-ink-900">
-              Ride<span className="text-brand-600">Local</span>
-            </span>
+            RIDE <span style={{ opacity: 0.75, fontWeight: 400 }}>LOCAL</span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav style={{ display: "flex", alignItems: "center", gap: "14px" }} className="hidden md:flex">
             {navLinks.map((l) => (
-              <Link key={l.label} to={l.to} className="nav-link">{l.label}</Link>
+              <Link
+                key={l.label}
+                to={l.to}
+                style={{
+                  fontSize: "0.9375rem",
+                  fontWeight: 700,
+                  color: "#F0C4BC",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  padding: "8px 14px",
+                  textDecoration: "none",
+                  transition: "color 150ms ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#F0C4BC")}
+              >
+                {l.label}
+              </Link>
             ))}
-            {user?.role === "OWNER"    && <Link to="/owner"    className="nav-link">Dashboard</Link>}
-            {user?.role === "ADMIN"    && <Link to="/admin"    className="nav-link">Admin</Link>}
-            {user?.role === "CUSTOMER" && <Link to="/bookings" className="nav-link">My Bookings</Link>}
+            {user?.role === "OWNER" && (
+              <Link
+                to="/owner"
+                style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.08em", padding: "8px 14px", textDecoration: "none" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#F0C4BC")}
+              >
+                Dashboard
+              </Link>
+            )}
+            {user?.role === "ADMIN" && (
+              <Link
+                to="/admin"
+                style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.08em", padding: "8px 14px", textDecoration: "none" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#F0C4BC")}
+              >
+                Admin
+              </Link>
+            )}
+            {user?.role === "CUSTOMER" && (
+              <Link
+                to="/bookings"
+                style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.08em", padding: "8px 14px", textDecoration: "none" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#F0C4BC")}
+              >
+                My Rides
+              </Link>
+            )}
           </nav>
 
-          {/* Desktop right: auth buttons */}
-          <div className="hidden items-center gap-2.5 md:flex">
+          {/* Desktop right */}
+          <div className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             {user ? (
               <>
-                <Link to="/profile" className="chip">{user.name.split(" ")[0]}</Link>
-                <button onClick={handleLogout} className="btn-secondary !py-2 !px-4 !text-sm">
+                <Link
+                  to="/profile"
+                  style={{
+                    fontSize: "0.9375rem",
+                    fontWeight: 700,
+                    color: "#F9D3CD",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    textDecoration: "none",
+                  }}
+                >
+                  {user.name.split(" ")[0]}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    fontSize: "0.9375rem",
+                    fontWeight: 700,
+                    color: "#F0C4BC",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#F0C4BC")}
+                >
                   Log out
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="btn-secondary !py-2 !px-4 !text-sm">Log in</Link>
-                <Link to="/get-started" className="btn-glass !py-2 !px-5 !text-sm">Get Started</Link>
+                <Link
+                  to="/login"
+                  style={{
+                    fontSize: "0.9375rem",
+                    fontWeight: 700,
+                    color: "#F0C4BC",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    textDecoration: "none",
+                    padding: "8px 14px",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#F0C4BC")}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/get-started"
+                  style={{
+                    fontSize: "0.875rem",
+                    fontWeight: 700,
+                    color: "#680A16",
+                    backgroundColor: "#F9D3CD",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    textDecoration: "none",
+                    padding: "10px 20px",
+                  }}
+                >
+                  Sign Up
+                </Link>
               </>
             )}
           </div>
 
           {/* Mobile hamburger */}
-          <div className="flex items-center gap-2 md:hidden">
-            <button
-              onClick={() => setMobileOpen((v) => !v)}
-              className="btn-secondary !p-2.5"
-              aria-label="Toggle menu"
-            >
-              {mobileOpen
-                ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" strokeLinecap="round"/></svg>
-                : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round"/></svg>
-              }
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile drawer */}
-        {mobileOpen && (
-          <div
-            className="px-5 py-4 md:hidden"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            className="md:hidden"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.875rem",
+              fontWeight: 700,
+              color: "#F9D3CD",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              padding: "6px 0",
+            }}
+            aria-label="Toggle menu"
           >
-            <div className="flex flex-col gap-1.5">
-              {navLinks.map((l) => (
-                <Link
-                  key={l.label}
-                  to={l.to}
-                  onClick={() => setMobileOpen(false)}
-                  className="nav-link"
-                >
-                  {l.label}
-                </Link>
-              ))}
-              {user?.role === "OWNER"    && <Link to="/owner"    onClick={() => setMobileOpen(false)} className="nav-link">Dashboard</Link>}
-              {user?.role === "ADMIN"    && <Link to="/admin"    onClick={() => setMobileOpen(false)} className="nav-link">Admin</Link>}
-              {user?.role === "CUSTOMER" && <Link to="/bookings" onClick={() => setMobileOpen(false)} className="nav-link">My Bookings</Link>}
+            {mobileOpen ? "[CLOSE]" : "[MENU]"}
+          </button>
+        </div>
+      </div>
 
-              <div
-                className="mt-3 flex gap-2.5 pt-4"
-                style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div
+          style={{
+            borderTop: "1px solid rgba(249, 211, 205, 0.2)",
+            padding: "24px",
+            background: "#5B0713",
+          }}
+          className="md:hidden"
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {navLinks.map((l) => (
+              <Link
+                key={l.label}
+                to={l.to}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: 700,
+                  color: "#F9D3CD",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                  textDecoration: "none",
+                }}
               >
-                {user ? (
-                  <>
-                    <Link to="/profile" onClick={() => setMobileOpen(false)} className="btn-secondary flex-1 text-sm">Profile</Link>
-                    <button onClick={handleLogout} className="btn-primary flex-1 text-sm">Log out</button>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/login"       onClick={() => setMobileOpen(false)} className="btn-secondary flex-1 text-sm">Log in</Link>
-                    <Link to="/get-started" onClick={() => setMobileOpen(false)} className="btn-glass flex-1 text-sm">Get Started</Link>
-                  </>
-                )}
-              </div>
+                {l.label}
+              </Link>
+            ))}
+            {user?.role === "OWNER" && (
+              <Link to="/owner" onClick={() => setMobileOpen(false)} style={{ fontSize: "1rem", fontWeight: 700, color: "#F9D3CD", textTransform: "uppercase", textDecoration: "none" }}>
+                Dashboard
+              </Link>
+            )}
+            {user?.role === "ADMIN" && (
+              <Link to="/admin" onClick={() => setMobileOpen(false)} style={{ fontSize: "1rem", fontWeight: 700, color: "#F9D3CD", textTransform: "uppercase", textDecoration: "none" }}>
+                Admin
+              </Link>
+            )}
+            {user?.role === "CUSTOMER" && (
+              <Link to="/bookings" onClick={() => setMobileOpen(false)} style={{ fontSize: "1rem", fontWeight: 700, color: "#F9D3CD", textTransform: "uppercase", textDecoration: "none" }}>
+                My Rides
+              </Link>
+            )}
+
+            <div style={{ borderTop: "1px solid rgba(249, 211, 205, 0.2)", paddingTop: "16px", marginTop: "8px", display: "flex", gap: "20px", alignItems: "center" }}>
+              {user ? (
+                <>
+                  <Link to="/profile" onClick={() => setMobileOpen(false)} style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F9D3CD", textTransform: "uppercase", textDecoration: "none" }}>
+                    Profile
+                  </Link>
+                  <button onClick={handleLogout} style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", background: "none", border: "none", cursor: "pointer", textTransform: "uppercase" }}>
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setMobileOpen(false)} style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", textDecoration: "none" }}>
+                    Login
+                  </Link>
+                  <Link to="/get-started" onClick={() => setMobileOpen(false)} style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#680A16", background: "#F9D3CD", padding: "10px 20px", textTransform: "uppercase", textDecoration: "none" }}>
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 }

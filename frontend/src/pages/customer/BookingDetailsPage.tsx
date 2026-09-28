@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, getErrorMessage } from "../../api/client";
 import { StatusBadge } from "../../components/StatusBadge";
+import { Loader } from "../../components/Loader";
 import { useAuth } from "../../context/AuthContext";
 
 export function BookingDetailsPage() {
@@ -11,7 +12,6 @@ export function BookingDetailsPage() {
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState(5);
-  const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
   const [disputeOpen, setDisputeOpen] = useState(false);
@@ -20,8 +20,7 @@ export function BookingDetailsPage() {
   const [disputeSent, setDisputeSent] = useState(false);
 
   function load() {
-    api
-      .get(`/bookings/${id}`)
+    api.get(`/bookings/${id}`)
       .then(({ data }) => setBooking(data.booking))
       .catch((err) => setError(getErrorMessage(err)));
   }
@@ -30,195 +29,158 @@ export function BookingDetailsPage() {
 
   async function handleCancel() {
     setBusy(true);
-    try {
-      await api.post(`/bookings/${id}/cancel`, { reason: "Customer requested cancellation" });
-      load();
-    } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setBusy(false);
-    }
+    try { await api.post(`/bookings/${id}/cancel`, { reason: "Customer requested cancellation" }); load(); }
+    catch (err) { setError(getErrorMessage(err)); }
+    finally { setBusy(false); }
   }
 
   async function handleRaiseDispute() {
-    setBusy(true);
-    setError(null);
-    try {
-      await api.post("/disputes", {
-        bookingId: id,
-        subject: disputeSubject,
-        description: disputeDesc,
-      });
-      setDisputeSent(true);
-    } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setBusy(false);
-    }
+    setBusy(true); setError(null);
+    try { await api.post("/disputes", { bookingId: id, subject: disputeSubject, description: disputeDesc }); setDisputeSent(true); }
+    catch (err) { setError(getErrorMessage(err)); }
+    finally { setBusy(false); }
   }
 
   async function handleReview() {
     setBusy(true);
-    try {
-      await api.post("/reviews", { bookingId: id, rating, comment });
-      load();
-    } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setBusy(false);
-    }
+    try { await api.post("/reviews", { bookingId: id, rating, comment }); load(); }
+    catch (err) { setError(getErrorMessage(err)); }
+    finally { setBusy(false); }
   }
 
-  if (error) return <div className="mx-auto max-w-2xl px-4 py-10 text-red-600">{error}</div>;
-  if (!booking) return <div className="mx-auto max-w-2xl px-4 py-10 text-ink-500">Loading...</div>;
+  if (error) return <div style={{ maxWidth: "720px", margin: "0 auto", padding: "56px 24px", color: "#FFAAAA", fontSize: "1.0625rem" }}>{error}</div>;
+  if (!booking) return <div style={{ maxWidth: "720px", margin: "0 auto", padding: "56px 24px" }}><Loader message="Loading booking record..." size="lg" /></div>;
 
   const canCancel = user?.role === "CUSTOMER" && ["PENDING_PAYMENT", "CONFIRMED"].includes(booking.status);
   const canPay = user?.role === "CUSTOMER" && booking.status === "PENDING_PAYMENT";
   const canReview = user?.role === "CUSTOMER" && booking.status === "COMPLETED" && !booking.review;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <div className="card p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="font-display text-xl font-bold text-ink-900">
-              {booking.vehicle?.brand} {booking.vehicle?.model}
-            </h1>
-            <p className="text-sm text-ink-500">
-              {new Date(booking.startTime).toLocaleString()} → {new Date(booking.endTime).toLocaleString()}
-            </p>
-          </div>
-          <StatusBadge status={booking.status} />
+    <div style={{ maxWidth: "720px", margin: "0 auto", padding: "56px 24px" }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "20px" }}>
+        <div>
+          <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+            BOOKING RECORD #{booking.id.slice(0, 8)}
+          </p>
+          <h1
+            style={{
+              fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: "clamp(2rem, 5vw, 3.25rem)",
+              lineHeight: 0.95,
+              color: "#F9D3CD",
+              textTransform: "uppercase",
+              margin: "6px 0 0",
+            }}
+          >
+            {booking.vehicle?.brand} {booking.vehicle?.model}
+          </h1>
+          <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "6px", fontWeight: 500 }}>
+            {new Date(booking.startTime).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} → {new Date(booking.endTime).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+          </p>
         </div>
+        <StatusBadge status={booking.status} />
+      </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <p className="text-ink-500">Pickup</p>
-            <p className="text-ink-900">{booking.pickupLocation}</p>
-          </div>
-          <div>
-            <p className="text-ink-500">Return</p>
-            <p className="text-ink-900">{booking.returnLocation}</p>
-          </div>
-          <div>
-            <p className="text-ink-500">Total amount</p>
-            <p className="font-semibold text-ink-900">₹{booking.totalAmount}</p>
-          </div>
-          <div>
-            <p className="text-ink-500">Payments</p>
-            <p className="text-ink-900">{booking.payments?.length || 0} record(s)</p>
-          </div>
+      {/* Details Box in Dark Wine Panel */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "24px",
+          marginTop: "36px",
+          border: "1px solid rgba(249, 211, 205, 0.25)",
+          backgroundColor: "#4E050E",
+          padding: "28px",
+        }}
+      >
+        <div>
+          <p className="label">Pickup Location</p>
+          <p style={{ fontSize: "1rem", color: "#FFFFFF", margin: "4px 0 0", fontWeight: 600 }}>{booking.pickupLocation}</p>
         </div>
-
-        <div className="mt-5 flex gap-3">
-          {canPay && (
-            <Link to={`/bookings/${id}/pay`} className="btn-primary">
-              Pay now
-            </Link>
-          )}
-          {canCancel && (
-            <button onClick={handleCancel} disabled={busy} className="btn-danger">
-              Cancel booking
-            </button>
-          )}
-          {["CONFIRMED", "ACTIVE", "COMPLETED"].includes(booking.status) && !disputeOpen && (
-            <button onClick={() => setDisputeOpen(true)} className="btn-secondary">
-              Report an issue
-            </button>
-          )}
+        <div>
+          <p className="label">Return Location</p>
+          <p style={{ fontSize: "1rem", color: "#FFFFFF", margin: "4px 0 0", fontWeight: 600 }}>{booking.returnLocation}</p>
         </div>
+        <div>
+          <p className="label">Total Amount</p>
+          <p style={{ fontFamily: "'Bebas Neue'", fontSize: "2rem", color: "#F9D3CD", margin: "2px 0 0" }}>₹{booking.totalAmount}</p>
+        </div>
+        <div>
+          <p className="label">Payment Status</p>
+          <p style={{ fontSize: "1rem", color: "#FFFFFF", margin: "4px 0 0", fontWeight: 600 }}>
+            {booking.payments?.length || 0} transaction log(s)
+          </p>
+        </div>
+      </div>
 
-        {disputeOpen && !disputeSent && (
-          <div className="mt-5 border-t border-neutral-200 pt-5">
-            <h3 className="font-display font-semibold text-ink-900">Report an issue</h3>
-            <p className="mt-1 text-sm text-ink-500">
-              This opens a ticket our team reviews — e.g. the bike didn't match the listing.
-            </p>
-            <input
-              className="input mt-3"
-              placeholder="Short subject"
-              value={disputeSubject}
-              onChange={(e) => setDisputeSubject(e.target.value)}
-            />
-            <textarea
-              className="input mt-2"
-              rows={3}
-              placeholder="What happened?"
-              value={disputeDesc}
-              onChange={(e) => setDisputeDesc(e.target.value)}
-            />
-            <div className="mt-3 flex gap-2">
-              <button onClick={() => setDisputeOpen(false)} className="btn-secondary flex-1">
-                Cancel
-              </button>
-              <button
-                onClick={handleRaiseDispute}
-                disabled={busy || !disputeSubject || disputeDesc.length < 10}
-                className="btn-primary flex-1"
-              >
-                Submit ticket
-              </button>
-            </div>
-          </div>
+      {/* Actions */}
+      <div style={{ display: "flex", gap: "12px", marginTop: "32px", flexWrap: "wrap" }}>
+        {canPay && (
+          <Link to={`/bookings/${id}/pay`} className="btn-primary" style={{ padding: "14px 28px" }}>
+            Pay Remaining Amount →
+          </Link>
         )}
-
-        {disputeSent && (
-          <div className="mt-5 rounded-xl bg-green-50 p-4 text-sm text-green-800">
-            Ticket submitted — our team will follow up on this booking.
-          </div>
+        {canCancel && (
+          <button onClick={handleCancel} disabled={busy} className="btn-danger" style={{ padding: "14px 24px" }}>
+            Cancel Booking
+          </button>
+        )}
+        {["CONFIRMED", "ACTIVE", "COMPLETED"].includes(booking.status) && !disputeOpen && (
+          <button onClick={() => setDisputeOpen(true)} className="btn-secondary" style={{ padding: "14px 24px" }}>
+            Report an Issue / Dispute
+          </button>
         )}
       </div>
 
+      {/* Dispute form */}
+      {disputeOpen && !disputeSent && (
+        <div style={{ marginTop: "32px", border: "1px solid rgba(249, 211, 205, 0.25)", backgroundColor: "#4E050E", padding: "28px" }}>
+          <h3 style={{ fontFamily: "'Bebas Neue'", fontSize: "1.75rem", color: "#F9D3CD", margin: 0 }}>REPORT AN ISSUE</h3>
+          <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "4px" }}>This opens a dispute ticket reviewed by platform administrators.</p>
+          <input className="input" style={{ marginTop: "16px" }} placeholder="Brief subject" value={disputeSubject} onChange={(e) => setDisputeSubject(e.target.value)} />
+          <textarea className="input" style={{ marginTop: "10px", minHeight: "90px" }} placeholder="Describe what occurred with vehicle condition or handover..." value={disputeDesc} onChange={(e) => setDisputeDesc(e.target.value)} />
+          <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+            <button onClick={() => setDisputeOpen(false)} className="btn-secondary" style={{ flex: 1 }}>Cancel</button>
+            <button onClick={handleRaiseDispute} disabled={busy || !disputeSubject || disputeDesc.length < 10} className="btn-primary" style={{ flex: 1 }}>Submit Ticket</button>
+          </div>
+        </div>
+      )}
+
+      {disputeSent && (
+        <div style={{ marginTop: "24px", padding: "16px 20px", backgroundColor: "rgba(249, 211, 205, 0.1)", border: "1px solid #F9D3CD", color: "#F9D3CD", fontSize: "0.9375rem" }}>
+          ✓ Ticket submitted — the moderation team will review this booking shortly.
+        </div>
+      )}
+
+      {/* Review form */}
       {canReview && (
-        <div className="card mt-5 p-6">
-          <h2 className="font-display font-bold text-ink-900">Rate your rental</h2>
-          <div className="mt-3 flex gap-1">
+        <div style={{ marginTop: "36px", border: "1px solid rgba(249, 211, 205, 0.25)", backgroundColor: "#4E050E", padding: "28px" }}>
+          <h2 style={{ fontFamily: "'Bebas Neue'", fontSize: "1.75rem", color: "#F9D3CD", margin: 0 }}>RATE YOUR TRIP</h2>
+          <div style={{ display: "flex", gap: "6px", marginTop: "12px" }}>
             {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setRating(n)}
-                onMouseEnter={() => setHoverRating(n)}
-                onMouseLeave={() => setHoverRating(0)}
-                className="transition-transform duration-100 hover:scale-110 focus:outline-none"
-              >
-                <svg
-                  className={`w-8 h-8 transition-colors duration-150 ${
-                    n <= (hoverRating || rating) ? "text-brand-600" : "text-neutral-200"
-                  }`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              </button>
+              <button key={n} type="button" onClick={() => setRating(n)}
+                style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.75rem", color: n <= rating ? "#F9D3CD" : "rgba(249, 211, 205, 0.3)" }}>★</button>
             ))}
           </div>
-          <textarea
-            className="input mt-3"
-            rows={3}
-            placeholder="How was the vehicle and owner?"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-          <button onClick={handleReview} disabled={busy} className="btn-primary mt-3">
-            Submit review
-          </button>
+          <textarea className="input" style={{ marginTop: "14px" }} rows={3} placeholder="How was the bike, pickup, and host owner?" value={comment} onChange={(e) => setComment(e.target.value)} />
+          <button onClick={handleReview} disabled={busy} className="btn-primary" style={{ marginTop: "14px" }}>Submit Review</button>
         </div>
       )}
 
       {booking.review && (
-        <div className="card mt-5 p-6 text-sm">
-          <div className="flex items-center gap-2">
-            <p className="font-semibold text-ink-900">You rated this rental</p>
-            <span className="text-brand-600 font-bold">★ {booking.review.rating}</span>
+        <div style={{ marginTop: "32px", borderTop: "1px solid rgba(249, 211, 205, 0.2)", paddingTop: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <p style={{ fontWeight: 700, color: "#FFFFFF", fontSize: "0.9375rem", margin: 0 }}>Your Rating:</p>
+            <span style={{ color: "#F9D3CD", fontWeight: 700 }}>★ {booking.review.rating}.0</span>
           </div>
-          {booking.review.comment && <p className="mt-1 text-ink-500">{booking.review.comment}</p>}
+          {booking.review.comment && <p style={{ color: "#F0C4BC", fontSize: "0.9375rem", marginTop: "6px" }}>{booking.review.comment}</p>}
         </div>
       )}
 
-      <button onClick={() => navigate(-1)} className="mt-5 text-sm text-brand-600 font-medium">
-        ← Back
+      <button onClick={() => navigate(-1)} style={{ marginTop: "36px", background: "none", border: "none", fontSize: "0.875rem", fontWeight: 700, color: "#F9D3CD", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        ← Return
       </button>
     </div>
   );

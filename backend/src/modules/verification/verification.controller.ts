@@ -7,8 +7,49 @@ import { requireAuth } from "../../middleware/auth";
 
 export const verificationRouter = Router();
 
-const submitSchema = z.object({
-  verificationType: z.enum(["USER_IDENTITY", "OWNER_KYC", "VEHICLE_DOCUMENTS"]),
+const submitSchema = z.preprocess((val: any) => {
+  if (!val || typeof val !== "object") return val;
+  const copy = { ...val };
+
+  if (!copy.verificationType) {
+    copy.verificationType = copy.vehicleId ? "VEHICLE_DOCUMENTS" : "USER_IDENTITY";
+  }
+
+  // Support flat submission or legacy fields
+  if (!Array.isArray(copy.documents) || copy.documents.length === 0) {
+    const docs: { documentType: string; secureFileReference: string }[] = [];
+    if (copy.drivingLicence || copy.licenceFront || copy.frontFileRef) {
+      docs.push({
+        documentType: "DRIVING_LICENSE",
+        secureFileReference: copy.drivingLicence || copy.licenceFront || copy.frontFileRef,
+      });
+    }
+    if (copy.aadharCard || copy.licenceBack || copy.backFileRef) {
+      docs.push({
+        documentType: copy.aadharCard ? "GOVT_ID" : "DRIVING_LICENSE",
+        secureFileReference: copy.aadharCard || copy.licenceBack || copy.backFileRef,
+      });
+    }
+    if (copy.secureFileReference && copy.documentType) {
+      const docType = copy.documentType === "DRIVING_LICENCE" ? "DRIVING_LICENSE" : copy.documentType;
+      docs.push({
+        documentType: docType,
+        secureFileReference: copy.secureFileReference,
+      });
+    }
+    if (docs.length > 0) {
+      copy.documents = docs;
+    }
+  } else {
+    copy.documents = copy.documents.map((d: any) => ({
+      ...d,
+      documentType: d.documentType === "DRIVING_LICENCE" ? "DRIVING_LICENSE" : d.documentType,
+    }));
+  }
+
+  return copy;
+}, z.object({
+  verificationType: z.enum(["USER_IDENTITY", "OWNER_KYC", "VEHICLE_DOCUMENTS"]).default("USER_IDENTITY"),
   vehicleId: z.string().uuid().optional(),
   documents: z
     .array(
@@ -25,7 +66,7 @@ const submitSchema = z.object({
       })
     )
     .min(1),
-});
+}));
 
 // Submits identity/KYC/vehicle documents and creates a PENDING verification
 // record for admin review. Storage upload itself happens client-side to

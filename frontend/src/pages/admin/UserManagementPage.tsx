@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api, getErrorMessage } from "../../api/client";
 import { StatusBadge } from "../../components/StatusBadge";
 
@@ -22,39 +23,105 @@ export function UserManagementPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-bold text-ink-900">User management</h1>
-        <select className="input !w-auto" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
-          <option value="">All roles</option>
-          <option value="CUSTOMER">Customer</option>
-          <option value="OWNER">Owner</option>
-          <option value="ADMIN">Admin</option>
+    <div style={{ maxWidth: "880px", margin: "0 auto", padding: "56px 24px" }}>
+      <p style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#F0C4BC", textTransform: "uppercase", letterSpacing: "0.15em" }}>
+        ADMINISTRATION
+      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "20px" }}>
+        <h1
+          style={{
+            fontFamily: "'Bebas Neue', 'Barlow Condensed', sans-serif",
+            fontSize: "clamp(3rem, 7vw, 5rem)",
+            lineHeight: 0.9,
+            letterSpacing: "0.01em",
+            color: "#F9D3CD",
+            textTransform: "uppercase",
+            margin: "8px 0 0",
+          }}
+        >
+          USER ACCOUNTS.
+        </h1>
+        <select
+          className="input"
+          style={{ width: "auto", padding: "8px 16px", fontSize: "0.875rem" }}
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+        >
+          <option value="">All Account Roles</option>
+          <option value="CUSTOMER">Customers (Tourists)</option>
+          <option value="OWNER">Vehicle Owners</option>
+          <option value="ADMIN">Platform Admins</option>
         </select>
       </div>
-      {error && <p className="mt-4 text-red-600">{error}</p>}
 
-      <div className="mt-5 space-y-2">
+      {error && <p style={{ marginTop: "24px", color: "#FFAAAA", fontSize: "0.9375rem" }}>{error}</p>}
+
+      <div style={{ marginTop: "40px", borderTop: "1px solid rgba(249, 211, 205, 0.3)" }}>
         {users.map((u) => (
-          <div key={u.id} className="card flex items-center justify-between p-4">
+          <div
+            key={u.id}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "24px 0",
+              borderBottom: "1px solid rgba(249, 211, 205, 0.2)",
+              gap: "20px",
+              flexWrap: "wrap",
+            }}
+          >
             <div>
-              <p className="font-semibold text-ink-900">
-                {u.name} <span className="text-ink-500 font-normal">· {u.role}</span>
+              <p
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "1.375rem",
+                  color: "#FFFFFF",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                {u.name} <span style={{ color: "#F0C4BC", fontWeight: 400, fontSize: "1rem" }}>· {u.role}</span>
               </p>
-              <p className="text-sm text-ink-500">{u.email}</p>
+              <p style={{ fontSize: "0.9375rem", color: "#F0C4BC", marginTop: "4px" }}>{u.email}</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
               <StatusBadge status={u.verificationStatus} />
               {u.isSuspended && <StatusBadge status="SUSPENDED" />}
               <button
                 onClick={() => toggleSuspend(u.id, u.isSuspended)}
-                className={u.isSuspended ? "btn-secondary !py-1.5 !px-3 text-sm" : "btn-danger !py-1.5 !px-3 text-sm"}
+                className={u.isSuspended ? "btn-secondary" : "btn-danger"}
+                style={{ padding: "8px 16px", fontSize: "0.875rem" }}
               >
                 {u.isSuspended ? "Unsuspend" : "Suspend"}
               </button>
             </div>
           </div>
         ))}
+
+        {users.length === 0 && (
+          <p style={{ color: "#F0C4BC", fontSize: "1rem", padding: "36px 0" }}>
+            No accounts found matching filter.
+          </p>
+        )}
+      </div>
+
+      <div style={{ marginTop: "40px" }}>
+        <Link
+          to="/admin"
+          style={{
+            fontSize: "0.875rem",
+            fontWeight: 700,
+            color: "#FFFFFF",
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+            borderBottom: "1px solid #FFFFFF",
+            paddingBottom: "2px",
+            textDecoration: "none",
+          }}
+        >
+          ← Return to Admin Hub
+        </Link>
       </div>
     </div>
   );
